@@ -2,8 +2,8 @@
 
 header('Content-Type: application/json');
 
-require_once('includes/melb-tram-fleet/trams.php');
-require_once('includes/melb-tram-routes/routes.php');
+require_once('includes/melb-tram-fleet/functions.php');
+require_once('includes/melb-tram-fleet/routes.php');
 require_once('includes/config.php');
 require_once('includes/ServiceRouteData.php');
 
@@ -27,7 +27,7 @@ foreach(explode(',', $classes) as $class)
 	foreach($melbourne_trams[strtoupper($class)] as $tramNumber)
 	{
 		$serviceData = new ServiceRouteData($tramNumber, getTramClass($tramNumber), $forceRefresh);
-	
+
 		if((strlen($serviceData->error) == 0) && isset($serviceData->currentLat) && isset($serviceData->currentLon))
 		{
 			$tram = new stdClass;

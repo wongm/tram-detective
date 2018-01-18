@@ -2,7 +2,7 @@
 
 ini_set('display_errors', 1);
 
-require_once('includes/melb-tram-fleet/trams.php');
+require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/ServiceData.php');
 
 date_default_timezone_set("Australia/Melbourne");
@@ -29,7 +29,7 @@ require_once('includes/Header.php');
 if(isset($serviceData->error))
 {
 	$errorclass = "error";
-			
+
 	switch ($serviceData->error)
 	{
 		case 'invalidroute':
@@ -68,12 +68,12 @@ else
     	// Convert to minutes, and round down
     	$predicted = strtotime($nextStop->PredictedArrivalDateTime);
     	$minutesuntil = floor(($predicted - $serviceData->currentTimestamp) / 60);
-    	
+
     	$minutesuntil = ($minutesuntil < 0) ? 0 : $minutesuntil;
-    	
+
     	// load stop data from the cache
     	$stopData = $serviceData->routeData->stops[(string)$nextStop->StopNo];
-    	
+
 ?>
 <p>Stop <?php echo $stopData->Name ?>, <?php echo $stopData->SuburbName ?>: <?php echo date('g:ia', $predicted) ?> (<?php echo $minutesuntil ?> minutes)</p>
 <?php
