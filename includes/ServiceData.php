@@ -9,6 +9,7 @@ class ServiceData extends Persistent
 {
 	var $tramNumber;
 	var $routeNo;
+	var $offUsualRoute;
 	var $destination;
 	var $direction;
 	var $nextStops;
@@ -62,7 +63,6 @@ class ServiceData extends Persistent
 			$this->tramNumber = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->tramNumber;
 			$this->routeNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->RouteNo;
 			$this->nextStops = $serviceResults->NewDataSet->NextPredictedStopsDetailsTable;
-
 			$this->offUsualRoute = $this->checkUsualRoute($tramClass, $this->routeNo);
 
 			$this->currentTimestamp = time();

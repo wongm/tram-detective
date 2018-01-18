@@ -32,25 +32,27 @@ var tramDirection = '';
 
 function initialize() {
     map = new google.maps.Map(document.getElementById("map-canvas"));
-    
-	var mapDataUrl = "../mapdata.php?class=" + getParameterByName('class');
-	
+
+	var mapDataUrl = "mapdata.php";
+    if (getParameterByName('class') != null)
+        mapDataUrl += "?class=" + getParameterByName('class');
+
     // get data and use it
 	$.getJSON( mapDataUrl , function( data ) {
 		$.each( data, function( index, tram ) {
 			// apply filtering
 			console.log($.inArray(tram.routeNo, tramRoutes));
-			
+
 			if (tramRoutes.length > 0 && ($.inArray(tram.routeNo, tramRoutes) < 0)) { return true; }
 			if (tramClasses.length > 0 && ($.inArray(tram.class, tramClasses) < 0)) { return true; }
 			if (tramDirection.length > 0 && tram.direction != tramDirection) { return true; }
-			
+
 			addMarker(tram.name, tram.lat, tram.lng, tram.routeNo, tram.destination, tram.direction);
 		});
 		map.fitBounds(bounds);
 	});
 }
-      
+
 function addMarker(tram, lat, lng, routeNo, destination, direction) {
 	var icon = (direction=='down') ? 'orange.png' : 'red.png';
 	var content = 'Tram ' + tram;
@@ -61,7 +63,7 @@ function addMarker(tram, lat, lng, routeNo, destination, direction) {
     	map: map,
     	icon: 'http://maps.google.com/mapfiles/ms/micons/' + icon,
     	title: content
-	});	
+	});
 	google.maps.event.addListener(markers[tram], 'click', function() {
 		infowindow.setContent('<div class="lightbox">' + content + '<br>Route ' + routeNo + ' towards ' + destination + '</div>');
 		infowindow.open(map, this);
@@ -81,7 +83,7 @@ function getParameterByName(name, url) {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 $(document).ready(function() {
-	
+
 });
 </script>
 <div id="map-canvas"></div>

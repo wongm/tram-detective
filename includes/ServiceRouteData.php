@@ -7,6 +7,7 @@ class ServiceRouteData extends Persistent
 {
 	var $tramNumber;
 	var $routeNo;
+	var $offUsualRoute;
 	var $destination;
 	var $direction;
 	var $currentTimestamp;
@@ -34,6 +35,7 @@ class ServiceRouteData extends Persistent
 		// Map the data back
 		$this->tramNumber = $serviceData->tramNumber;
 		$this->routeNo = $serviceData->routeNo;
+		$this->offUsualRoute = $serviceData->offUsualRoute;
 		$this->destination = $serviceData->destination;
 		$this->direction = $serviceData->direction;
 		$this->currentTimestamp = $serviceData->currentTimestamp;

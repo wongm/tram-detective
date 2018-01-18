@@ -37,6 +37,7 @@ foreach(explode(',', $classes) as $class)
 			$tram->lat = $serviceData->currentLat;
 			$tram->lng = $serviceData->currentLon;
 			$tram->routeNo = (int)$serviceData->routeNo;
+			$tram->offUsualRoute = $serviceData->offUsualRoute;
 			$tram->destination = $serviceData->destination;
 			$tram->direction = $serviceData->direction;
 			$trams[] = $tram;
