@@ -7,7 +7,7 @@ require_once('includes/melb-tram-routes/routes.php');
 require_once('includes/config.php');
 require_once('includes/ServiceRouteData.php');
 
-$classes = 'z1,z2,z3,a1,a2,b1,b2,c,c2,d1,d2,e';
+$classes = 'z3,a1,a2,c,c2,d1,d2,e,e2';
 $forceRefresh = false;
 
 if (isset($_GET['class']))
