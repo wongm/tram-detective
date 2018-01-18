@@ -22,7 +22,7 @@ if (isset($_GET['forceRefresh']))
 
 $trams = array();
 
-foreach(split(',', $classes) as $class)
+foreach(explode(',', $classes) as $class)
 {
 	foreach($melbourne_trams[strtoupper($class)] as $tramNumber)
 	{
