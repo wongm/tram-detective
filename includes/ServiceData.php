@@ -7,7 +7,7 @@ require_once('XSoapClient.php');
 
 class ServiceData extends Persistent 
 {
-	var $vehicleNo;
+	var $tramNumber;
 	var $routeNo;
 	var $destination;
 	var $direction;
@@ -20,7 +20,7 @@ class ServiceData extends Persistent
 	
 	private $soapClient;
 	
-	function ServiceData($vehicleNo)
+	function ServiceData($tramNumber, $tramClass)
 	{
 		$this->soapClient = new XSoapClient("http://ws.tramtracker.com.au/pidsservice/pids.asmx?wsdl");
     
@@ -36,13 +36,13 @@ class ServiceData extends Persistent
 		$this->soapClient->__setSoapHeaders(array($headers));
 		
 		// Now the heavy lifting
-		$this->loadServiceData($vehicleNo);
+		$this->loadServiceData($tramNumber);
 	}
 	
-	private function loadServiceData($vehicleNo)
+	private function loadServiceData($tramNumber)
 	{
 		// Setup the GetNextPredictedArrivalTimeAtStopsForTramNo parameters 
-		$ap_param = array( 'tramNo' => $vehicleNo);
+		$ap_param = array( 'tramNo' => $tramNumber);
 		
 		// Call GetNextPredictedArrivalTimeAtStopsForTramNo () 
 		$error = 0;
@@ -56,9 +56,11 @@ class ServiceData extends Persistent
 		
 		$serviceResults = simplexml_load_string($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult->any);
 		
-		$this->vehicleNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->VehicleNo;
+		$this->tramNumber = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->tramNumber;
 		$this->routeNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->RouteNo;
 		$this->nextStops = $serviceResults->NewDataSet->NextPredictedStopsDetailsTable;
+		
+		$this->offUsualRoute = checkUsualRoute($tramClass, $this->routeNo);
 		
 		$this->currentTimestamp = time();
 		
@@ -94,6 +96,13 @@ class ServiceData extends Persistent
 		$currentLocation = $this->routeData->stops[$currentStopNo];
 		$this->currentLat = $currentLocation->Latitude;
 		$this->currentLon = $currentLocation->Longitude;
+	}
+	
+	private function checkUsualRoute($tramClass, $routeNo)
+	{
+		require_once('melb-tram-fleet/routes.php');
+		
+		return array_key_exists($routeNo, $tram_routes[$tramClass]);
 	}
 	
 	private function loadRouteData($cacheLocation, $isUpDirection)

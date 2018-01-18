@@ -2,28 +2,28 @@
 
 ini_set('display_errors', 1);
 
-require_once('includes/MelbourneTrams.php');
+require_once('includes/melb-tram-fleet/trams.php');
 require_once('includes/ServiceData.php');
 
 date_default_timezone_set("Australia/Melbourne");
 
-$tramNo = (int) $_GET['id'];
-if (!is_numeric($tramNo))
+$tramNumber = (int) $_GET['id'];
+if (!is_numeric($tramNumber))
 {
 	drawErrorPage();
 	die();
 }
 
-$serviceData = new ServiceData($tramNo, $fatMode=true);
-
-if (getTramClassAndNumber($tramNo) == null)
+if (getTramClassAndNumber($tramNumber) == null)
 {
 	drawErrorPage();
 	die();
 }
 
-$pageTitle = "Tram " . getTramClassAndNumber($tramNo);
-$pageDescription = "Tracking tram " . getTramClassAndNumber($tramNo) . " around Melbourne";
+$serviceData = new ServiceData($tramNumber, getTramClass($tramNumber), $fatMode=true);
+
+$pageTitle = "Tram " . getTramClassAndNumber($tramNumber);
+$pageDescription = "Tracking tram " . getTramClassAndNumber($tramNumber) . " around Melbourne";
 require_once('includes/Header.php');
 
 if(isset($serviceData->error))
@@ -55,6 +55,13 @@ else
 ?>
 <div class="inservice"><p>Currently running on route <?php echo $serviceData->routeNo ?> towards <?php echo $serviceData->destination ?>.</p>
 <?php
+
+	if ($this->offUsualRoute)
+	{
+?>
+<div><p>Tram is off the usual route for a <?php echo getTramClass($tramNumber); ?> class.</p></div>
+<?php
+	}
 
     foreach ($serviceData->nextStops as $nextStop)
     {
