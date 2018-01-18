@@ -47,14 +47,14 @@ function initialize() {
 			if (tramClasses.length > 0 && ($.inArray(tram.class, tramClasses) < 0)) { return true; }
 			if (tramDirection.length > 0 && tram.direction != tramDirection) { return true; }
 
-			addMarker(tram.name, tram.lat, tram.lng, tram.routeNo, tram.destination, tram.direction);
+			addMarker(tram.name, tram.lat, tram.lng, tram.routeNo, tram.destination, tram.direction, tram.offUsualRoute);
 		});
 		map.fitBounds(bounds);
 	});
 }
 
-function addMarker(tram, lat, lng, routeNo, destination, direction) {
-	var icon = (direction=='down') ? 'orange.png' : 'red.png';
+function addMarker(tram, lat, lng, routeNo, destination, direction, offUsualRoute) {
+	var icon = offUsualRoute ? 'red.png' : ((direction=='down') ? 'orange.png' : 'blue.png');
 	var content = 'Tram ' + tram;
 	latlngs[tram] = new google.maps.LatLng(lat, lng);
 	bounds.extend(latlngs[tram]);
