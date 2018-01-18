@@ -104,8 +104,8 @@ class ServiceData extends Persistent
 	
 	private function checkUsualRoute($tramClass, $routeNo)
 	{
-		require_once('melb-tram-routes/routes.php');		
-		return !array_key_exists($routeNo, $tram_routes[$tramClass]);
+		require_once('melb-tram-routes/routes.php');
+		return !in_array($routeNo, $tram_routes[$tramClass]);
 	}
 	
 	private function loadRouteData($cacheLocation, $isUpDirection)
