@@ -56,7 +56,7 @@ else
 <div class="inservice"><p>Currently running on route <?php echo $serviceData->routeNo ?> towards <?php echo $serviceData->destination ?>.</p>
 <?php
 
-	if ($this->offUsualRoute)
+	if ($serviceData->offUsualRoute)
 	{
 ?>
 <div><p>Tram is off the usual route for a <?php echo getTramClass($tramNumber); ?> class.</p></div>

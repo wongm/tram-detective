@@ -36,10 +36,10 @@ class ServiceData extends Persistent
 		$this->soapClient->__setSoapHeaders(array($headers));
 		
 		// Now the heavy lifting
-		$this->loadServiceData($tramNumber);
+		$this->loadServiceData($tramNumber, $tramClass);
 	}
 	
-	private function loadServiceData($tramNumber)
+	private function loadServiceData($tramNumber, $tramClass)
 	{
 		// Setup the GetNextPredictedArrivalTimeAtStopsForTramNo parameters 
 		$ap_param = array( 'tramNo' => $tramNumber);
@@ -54,36 +54,40 @@ class ServiceData extends Persistent
 			return;
 		} 
 		
-		$serviceResults = simplexml_load_string($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult->any);
 		
-		$this->tramNumber = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->tramNumber;
-		$this->routeNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->RouteNo;
-		$this->nextStops = $serviceResults->NewDataSet->NextPredictedStopsDetailsTable;
+		if (isset($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult))
+		{
+			$serviceResults = simplexml_load_string($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult->any);
 		
-		$this->offUsualRoute = checkUsualRoute($tramClass, $this->routeNo);
+			$this->tramNumber = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->tramNumber;
+			$this->routeNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->RouteNo;
+			$this->nextStops = $serviceResults->NewDataSet->NextPredictedStopsDetailsTable;
+			
+			$this->offUsualRoute = $this->checkUsualRoute($tramClass, $this->routeNo);
+			
+			$this->currentTimestamp = time();
+			
+			$isUpDirection = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Up) == 'true';
+			$atLayover = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->AtLayover) == 'true';
+			$available = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Available) == 'true';
+			$this->direction = $isUpDirection ? 'up' : 'down';
 		
-		$this->currentTimestamp = time();
-		
-		$isUpDirection = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Up) == 'true';
-		$atLayover = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->AtLayover) == 'true';
-		$available = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Available) == 'true';
-		$this->direction = $isUpDirection ? 'up' : 'down';
+			if (!$available)
+			{
+				$this->error = "notpublic";
+				return;
+			}
+			
+			if ($atLayover && sizeof($this->nextStops) == 0)
+			{
+				$this->error = "atterminus";
+				return;
+			}
+		}
 		
 		if (!isset($serviceResults->NewDataSet))	
 		{
 			$this->error = "offnetwork";
-			return;
-		}
-		
-		if (!$available)
-		{
-			$this->error = "notpublic";
-			return;
-		}
-		
-		if ($atLayover && sizeof($this->nextStops) == 0)
-		{
-			$this->error = "atterminus";
 			return;
 		}
 		
@@ -100,9 +104,8 @@ class ServiceData extends Persistent
 	
 	private function checkUsualRoute($tramClass, $routeNo)
 	{
-		require_once('melb-tram-fleet/routes.php');
-		
-		return array_key_exists($routeNo, $tram_routes[$tramClass]);
+		require_once('melb-tram-routes/routes.php');		
+		return !array_key_exists($routeNo, $tram_routes[$tramClass]);
 	}
 	
 	private function loadRouteData($cacheLocation, $isUpDirection)
