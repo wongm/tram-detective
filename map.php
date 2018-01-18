@@ -1,5 +1,5 @@
 <?php
-require_once('includes/MelbourneTrams.php');
+require_once('includes/melb-tram-fleet/trams.php');
 require_once('includes/config.php');
 
 $pageTitle = "Fleet Tracker";

@@ -5,7 +5,7 @@ require_once('ServiceData.php');
 
 class ServiceRouteData extends Persistent 
 {
-	var $vehicleNo;
+	var $tramNumber;
 	var $routeNo;
 	var $destination;
 	var $direction;
@@ -14,25 +14,25 @@ class ServiceRouteData extends Persistent
 	var $currentLon;
 	var $error;
 	
-	function ServiceRouteData($vehicleNo, $forceRefresh)
+	function ServiceRouteData($tramNumber, $tramClass, $forceRefresh)
 	{
 		// Enable persistance if required
-		parent::__construct("cache/service/tram$vehicleNo.ser");
+		parent::__construct("cache/service/tram$tramNumber.ser");
 		
 		// try to load data
 		$this->open();
 		
 		// if something found, then skip everything, unless a refresh is being forced
-		if(isset($this->vehicleNo) && !$forceRefresh)
+		if(isset($this->tramNumber) && !$forceRefresh)
 		{
 			return $this;
 		}
 		
 		// Now the heavy lifting
-		$serviceData = new ServiceData($vehicleNo);
+		$serviceData = new ServiceData($tramNumber, $tramClass);
 		
 		// Map the data back
-		$this->vehicleNo = $serviceData->vehicleNo;
+		$this->tramNumber = $serviceData->tramNumber;
 		$this->routeNo = $serviceData->routeNo;
 		$this->destination = $serviceData->destination;
 		$this->direction = $serviceData->direction;
