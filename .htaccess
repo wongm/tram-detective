@@ -1,0 +1,5 @@
+Options +FollowSymLinks
+RewriteEngine On
+RewriteRule ^tram/([0-9]+)$ tram.php?id=$1 [L,QSA]
+RewriteRule ^tram/(.*)$ tram.php [L,QSA]
+RewriteRule ^map/(.*)$ map.php [L,QSA]
