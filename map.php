@@ -33,8 +33,10 @@ var tramDirection = '';
 function initialize() {
     map = new google.maps.Map(document.getElementById("map-canvas"));
     
+	var mapDataUrl = "../mapdata.php?class=" + getParameterByName('class');
+	
     // get data and use it
-	$.getJSON( "../mapdata.php", function( data ) {
+	$.getJSON( mapDataUrl , function( data ) {
 		$.each( data, function( index, tram ) {
 			// apply filtering
 			console.log($.inArray(tram.routeNo, tramRoutes));
@@ -64,6 +66,16 @@ function addMarker(tram, lat, lng, routeNo, destination, direction) {
 		infowindow.setContent('<div class="lightbox">' + content + '<br>Route ' + routeNo + ' towards ' + destination + '</div>');
 		infowindow.open(map, this);
 	});
+}
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
