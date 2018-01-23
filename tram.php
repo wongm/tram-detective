@@ -41,6 +41,9 @@ if(isset($serviceData->error))
 		case 'offnetwork':
 			$errormessage = 'Tram is not on the network.';
 			break;
+		case 'nodata':
+			$errormessage = 'Tram is on route ' . $serviceData->routeNo . ' towards ' . $serviceData->destination . ' but has no location data available.';
+			break;
 		case 'atterminus':
 			$errormessage = 'Tram is at the route ' . $serviceData->routeNo . ' terminus at ' . $serviceData->destination . '.';
 			$errorclass = "terminus";

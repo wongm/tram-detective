@@ -96,7 +96,14 @@ class ServiceData extends Persistent
 		$this->routeData = $this->loadRouteData($cacheLocation, $isUpDirection);
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;
 
-		$currentStopNo = (string)$this->nextStops[0]->StopNo;
+		if (sizeof($this->nextStops) == 0)
+		{
+			$this->error = "nodata";
+			return;
+		}
+		
+		$nextStop = $this->nextStops[0];
+		$currentStopNo = (string)$nextStop->StopNo;
 		$currentLocation = $this->routeData->stops[$currentStopNo];
 		$this->currentLat = $currentLocation->Latitude;
 		$this->currentLon = $currentLocation->Longitude;
