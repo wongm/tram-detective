@@ -9,7 +9,7 @@ $result = $mysqli->query($tableCheck);
 
 if ($result->num_rows == 0)
 {
-	$tableCreate = "CREATE TABLE `" . $config['dbName'] . "`.`trams` ( `id` INT NOT NULL , `lastupdated` DATETIME NOT NULL , `lat` DECIMAL NOT NULL , `long` DECIMAL NOT NULL )";
+	$tableCreate = "CREATE TABLE `" . $config['dbName'] . "`.`trams` ( `id` INT NOT NULL , `lastupdated` DATETIME NOT NULL , `lat` DECIMAL(10, 8) NOT NULL , `lng` DECIMAL(11, 8) NOT NULL )";
 	$result = $mysqli->query($tableCreate);
 	echo "Table created!<BR>";
 }
