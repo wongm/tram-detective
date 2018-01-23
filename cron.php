@@ -4,6 +4,9 @@ require_once('includes/melb-tram-fleet/routes.php');
 require_once('includes/config.php');
 require_once('includes/ServiceRouteData.php');
 
+if (!isset($_GET['token']) || $_GET['token'] != $config['cron'])
+	die();
+
 $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 
 error_reporting(E_ALL); 
@@ -19,18 +22,30 @@ while($row = $result->fetch_assoc())
 	$serviceData = new ServiceRouteData($tramNumber, getTramClass($tramNumber), true);
 	$currentLat = $serviceData->currentLat;
 	$currentLon = $serviceData->currentLon;
+	$routeNo = (int)$serviceData->routeNo;
+	$offUsualRoute = $serviceData->offUsualRoute;
+	$destination = $serviceData->destination;
+	$direction = $serviceData->direction;
 	
 	if ($currentLat != "" && $currentLon != "")
 	{
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		if ($offUsualRoute != '1')
+		{
+			$offUsualRoute = 0;
+		}
+		
+		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = '" . $destination . "', `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
+		$result3 = $mysqli->query($tableCheck);
+		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
+		$result2 = $mysqli->query($tableCheck);
 		$type = "LOCATION";
 	}
 	else
 	{
 		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$result2 = $mysqli->query($tableCheck);
 		$type = "DATE";
 	}
-	$result2 = $mysqli->query($tableCheck);
 	echo "Updated $tramNumber $type<BR>";
 }
 
