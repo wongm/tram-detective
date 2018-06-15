@@ -6,12 +6,7 @@ $pageTitle = "Fleet Tracker";
 $pageDescription = "Tracking every tram in Melbourne";
 require_once('includes/Header.php');
 ?>
-<style type="text/css">
-h1 { display: none; }
-html { height: 100% }
-body { height: 100%; margin: 0; padding: 0 }
-#map-canvas { height: 100% }
-</style>
+<link rel="stylesheet" type="text/css" href="css/style.css">
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $config['googleapi'] ?>&sensor=false"></script>
 <script type="text/javascript">
 var map;
