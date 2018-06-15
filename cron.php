@@ -15,6 +15,12 @@ ini_set('display_errors', 1);
 $tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE lastupdated < (NOW() - INTERVAL 10 MINUTE) ORDER BY lastupdated ASC LIMIT 0, 20";
 $result = $mysqli->query($tableCheck);
 
+if ($result === false)
+{
+	echo "Initialise database";
+	die();
+}
+
 while($row = $result->fetch_assoc())
 {
 	$tramNumber = $row['id'];
