@@ -87,9 +87,8 @@ $(document).ready(function() {
 <div id="content">
 	<div id="map-canvas"></div>
 </div>
-<div id="footer">
-	<span id="updated"></span>
-</div>
+<span id="updated"></span>
+<a href="/">Home</a>
 <?php
 require_once('includes/Footer.php');
 ?>

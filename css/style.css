@@ -11,14 +11,6 @@ body {
     left:0px;
     position:fixed;
 }
-#footer {
-    height:1em;
-    width:100%;
-    bottom:0px;
-    left:0px;
-	padding: 10px;
-    position:fixed;
-}
 #content {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
