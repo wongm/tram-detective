@@ -91,7 +91,7 @@ function drawTable($trams, $type)
 {
 	if ($trams == null)
 	{
-		echo "<p>No trams found!</p>";
+		echo '<div class="alert alert-warning">No trams found!</div>';
 	}
 	else
 	{
@@ -124,7 +124,7 @@ function drawTable($trams, $type)
 			
 			if ($type != 'stabled')
 			{
-				echo "<td><a href=\"/tram.php?id=" . $tram->id . "\">View current location</a></td>";
+				echo "<td><a href=\"tram.php?id=" . $tram->id . "\">View current location</a></td>";
 			}
 			echo "</tr>";
 		}

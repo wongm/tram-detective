@@ -52,7 +52,7 @@ function initialize() {
 		
 		if (count == 0)
 		{
-			$('#map-canvas').html('<div>No trams found!</div>');
+			$('#map-canvas').html('<div class="alert alert-warning">No trams found!</div>');
 		}
 		else
 		{
@@ -96,11 +96,29 @@ $(document).ready(function() {
 
 });
 </script>
-<div id="content">
-	<div id="map-canvas"></div>
+<style>
+body {
+     overflow: hidden;
+}
+h1 {
+}
+.container-fluid {
+	padding: 0;
+}
+#footer {
+    position: absolute;
+    bottom: 25px;
+    padding-left: 20px;
+}
+.alert {
+	margin-left: 10px;
+}
+</style>
+<div id="map-canvas"></div>
+<div id="topLink">
+	<a href="/">&larr; Go back home</a>
 </div>
 <span id="updated"></span>
-<a href="/">Home</a>
 <?php
 require_once('includes/Footer.php');
 ?>
