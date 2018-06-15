@@ -10,13 +10,13 @@ date_default_timezone_set("Australia/Melbourne");
 $tramNumber = (int) $_GET['id'];
 if (!is_numeric($tramNumber))
 {
-	drawErrorPage();
+	drawErrorPage($tramNumber);
 	die();
 }
 
 if (getTramClassAndNumber($tramNumber) == null)
 {
-	drawErrorPage();
+	drawErrorPage($tramNumber);
 	die();
 }
 
@@ -88,8 +88,16 @@ else
 <?php
 require_once('includes/Footer.php');
 
-function drawErrorPage()
+function drawErrorPage($tramNumber)
 {
-    echo "Not a tram!";
+	$pageTitle = "Tram " . $tramNumber;
+	require_once('includes/Header.php');
+?>
+<div class="alert alert-danger" role="alert">
+  Not a tram!
+</div>
+<a href="../">Home</a>
+<?php
+	require_once('includes/Footer.php');
 }
 ?>
