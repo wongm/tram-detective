@@ -28,7 +28,7 @@ require_once('includes/Header.php');
 
 if(isset($serviceData->error))
 {
-	$errorclass = "error";
+	$errorclass = "alert alert-warning";
 
 	switch ($serviceData->error)
 	{
@@ -56,7 +56,7 @@ if(isset($serviceData->error))
 else
 {
 ?>
-<div class="inservice"><p>Currently running on route <?php echo $serviceData->routeNo ?> towards <?php echo $serviceData->destination ?>.</p>
+<div class="inservice"><p class="alert alert-success">Currently running on route <?php echo $serviceData->routeNo ?> towards <?php echo $serviceData->destination ?>.</p>
 <?php
 
 	if ($serviceData->offUsualRoute)
