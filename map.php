@@ -34,21 +34,24 @@ function initialize() {
 
     // get data and use it
 	$.getJSON( mapDataUrl , function( data ) {
-		$.each( data, function( index, tram ) {
+		$.each( data.trams, function( index, tram ) {
 			// apply filtering
 			console.log($.inArray(tram.routeNo, tramRoutes));
 
 			if (tramRoutes.length > 0 && ($.inArray(tram.routeNo, tramRoutes) < 0)) { return true; }
 			if (tramClasses.length > 0 && ($.inArray(tram.class, tramClasses) < 0)) { return true; }
-			if (tramDirection.length > 0 && tram.direction != tramDirection) { return true; }
-
-			addMarker(tram.name, tram.lat, tram.lng, tram.routeNo, tram.destination, tram.direction, tram.offUsualRoute);
+			if (tramDirection.length > 0 && tram.direction != tramDirection) { return true; }			
+			
+			if (getParameterByName('offroute') == null || tram.offUsualRoute)
+				addMarker(tram.name, tram.lat, tram.lng, tram.routeNo, tram.destination, tram.direction, tram.offUsualRoute, tram.lastupdated);
 		});
 		map.fitBounds(bounds);
+		
+		$('#updated').html('<div class="lightbox">Data between ' + data.minlastupdated + ' and ' + data.maxlastupdated + '</div>');
 	});
 }
 
-function addMarker(tram, lat, lng, routeNo, destination, direction, offUsualRoute) {
+function addMarker(tram, lat, lng, routeNo, destination, direction, offUsualRoute, lastupdated) {
 	var icon = offUsualRoute ? 'red.png' : ((direction=='down') ? 'orange.png' : 'blue.png');
 	var content = 'Tram ' + tram;
 	latlngs[tram] = new google.maps.LatLng(lat, lng);
@@ -60,7 +63,7 @@ function addMarker(tram, lat, lng, routeNo, destination, direction, offUsualRout
     	title: content
 	});
 	google.maps.event.addListener(markers[tram], 'click', function() {
-		infowindow.setContent('<div class="lightbox">' + content + '<br>Route ' + routeNo + ' towards ' + destination + '</div>');
+		infowindow.setContent('<div class="lightbox">' + content + '<br>Route ' + routeNo + ' towards ' + destination + '<br>Updated ' + lastupdated + '</div>');
 		infowindow.open(map, this);
 	});
 }
@@ -81,7 +84,12 @@ $(document).ready(function() {
 
 });
 </script>
-<div id="map-canvas"></div>
+<div id="content">
+	<div id="map-canvas"></div>
+</div>
+<div id="footer">
+	<span id="updated"></span>
+</div>
 <?php
 require_once('includes/Footer.php');
 ?>
