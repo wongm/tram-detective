@@ -22,6 +22,8 @@ switch ($type)
 $pageDescription = "Tracking the trams of Melbourne";
 require_once('includes/Header.php');
 
+echo "<p>Click column headers to reorder</p>";
+
 drawTable($trams, $type);
 ?>
 <a href="/">Home</a>
