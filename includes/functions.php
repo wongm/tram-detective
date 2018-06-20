@@ -70,17 +70,27 @@ function getAllTramsInternal($type)
 	$trams = [];
 	while($row = $result->fetch_assoc())
 	{
-		$formattedprediction = new DateTime();
-		$formattedprediction->setTimestamp(strtotime($row['lastupdated']));
-		$formattedprediction->setTimezone($melbourneTimezone);
-		$formatteddate = $formattedprediction->format('d/m/Y H:i');
+		$lastupdateddate = new DateTime();
+		$lastupdateddate->setTimestamp(strtotime($row['lastupdated']));
+		$lastupdateddate->setTimezone($melbourneTimezone);
+		$formattedlastupdated = $lastupdateddate->format('d/m/Y H:i');
+		
+		$formattedlastservice = "";
+		if (substr($row['lastservice'], 0, 4) != '0000')
+		{
+			$lastservicedate = new DateTime();
+			$lastservicedate->setTimestamp(strtotime($row['lastservice']));
+			$lastservicedate->setTimezone($melbourneTimezone);
+			$formattedlastservice = $lastservicedate->format('d/m/Y H:i');
+		}
 
 		$tram = new stdClass;
 		$tram->class = getTramClass($row['id']);
 		$tram->id = $row['id'];
 		$tram->routeNo = $row['routeNo'];
 		$tram->destination = $row['destination'];
-		$tram->lastupdated = $formatteddate;
+		$tram->lastupdated = $formattedlastupdated;
+		$tram->lastservice = $formattedlastservice;
 		$trams[] = $tram;
 	}
 	
@@ -104,7 +114,7 @@ function drawTable($trams, $type)
 		}
 		else
 		{
-			$headers .= "<th>Last updated</th>";
+			$headers .= "<th>Last in service</th>";
 		}
 		
 		echo "$headers</tr></thead><tbody>";
@@ -112,17 +122,19 @@ function drawTable($trams, $type)
 		foreach($trams as $tram){
 			$field = get_object_vars($tram); 
 			echo "<tr>";
-			$column = 1;
-			foreach($field as $value )
+			foreach($field as $key => $value )
 			{
-				if ($type != 'stabled' || $column == 1 || $column == 2 || $column == 5)
+				if (($type != 'stabled' && $key != "lastservice") || $key == "class" || $key == "id")
 				{
 					echo "<td>$value</td>";
 				}
-			   $column++;
 			}
 			
-			if ($type != 'stabled')
+			if ($type == 'stabled')
+			{
+				echo "<td>$tram->lastservice</td>";
+			}
+			else
 			{
 				echo "<td><a href=\"tram.php?id=" . $tram->id . "\">View current location</a></td>";
 			}

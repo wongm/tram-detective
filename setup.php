@@ -24,6 +24,16 @@ if ($result->num_rows == 0)
 	echo "`trams_history` table created!<BR>";
 }
 
+$tableCheck = "SELECT * FROM information_schema.columns WHERE table_schema = '" . $config['dbName'] . "' AND table_name = 'trams' AND column_name = 'lastservice' LIMIT 1;";
+$result = $mysqli->query($tableCheck);
+
+if ($result->num_rows == 0)
+{
+	$tableCreate = "ALTER TABLE `" . $config['dbName'] . "`.`trams` ADD COLUMN `lastservice` DATETIME NOT NULL AFTER `lastupdated`";
+	$result = $mysqli->query($tableCreate);
+	echo "`lastservice` column added to `trams` table!<BR>";
+}
+
 require_once('includes/melb-tram-fleet/trams.php');
 
 foreach (array_keys($melbourne_trams) as $class)
