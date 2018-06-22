@@ -48,7 +48,7 @@ while($row = $result->fetch_assoc())
 	}
 	else
 	{
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `lastupdated` = NOW() WHERE id = " . $tramNumber;
 		$result2 = $mysqli->query($tableCheck);
 		$type = "DATE";
 	}
