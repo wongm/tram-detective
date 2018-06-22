@@ -114,7 +114,7 @@ function drawTable($trams, $type)
 		}
 		else
 		{
-			$headers .= "<th>Last in service</th>";
+			$headers .= "<th>Last seen</th>";
 		}
 		
 		echo "$headers</tr></thead><tbody>";
