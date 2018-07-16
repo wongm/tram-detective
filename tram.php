@@ -50,6 +50,9 @@ if(isset($serviceData->error))
 ?>
 <div class="<?php echo $errorclass ?>"><p><?php echo $errormessage ?></p></div>
 <?php
+
+drawViewHistoryLink($tramNumber);
+
 }
 else
 {
@@ -63,6 +66,8 @@ else
 <div><p>Tram is off the usual route for a <?php echo getTramClass($tramNumber); ?> class.</p></div>
 <?php
 	}
+
+	drawViewHistoryLink($tramNumber);
 
     foreach ($serviceData->nextStops as $nextStop)
     {
@@ -85,6 +90,11 @@ else
 <!-- Raw data: <?php print_r($serviceData) ?>-->
 <?php
 require_once('includes/Footer.php');
+
+function drawViewHistoryLink($tramNumber)
+{
+	echo "<p><a href=\"history.php?id=" . $tramNumber . "\">View service history</a></p>";
+}
 
 function drawErrorPage($tramNumber)
 {

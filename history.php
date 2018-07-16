@@ -24,10 +24,12 @@ require_once('includes/Header.php');
 
 $history = getAllTramHistory($tramNumber);
 
+echo "<p><a href=\"tram.php?id=" . $tramNumber . "\">View current location</a></p>";
+
 echo "<table class=\"sortable-theme-bootstrap\" data-sortable><thead><tr><th>Date</th><th>Routes</th></tr></thead><tbody>";
 foreach($history as $day)
 {
-	echo "<tr><td>" . $day->date . "</td><td>" . $day->routes . "</td></tr>";
+	echo "<tr><td data-value=\"" . $day->order . "\">" . $day->date . "</td><td>" . $day->routes . "</td></tr>\r\n";
 }
 echo "</tbody></table>";
 

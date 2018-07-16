@@ -7,7 +7,7 @@ require_once('includes/Header.php');
 <form action="tram.php" method="get">
 <label for="id">Tram number</label>
 <input type="number" id="id" name="id" maxlength="4" size="4" />
-<input type="submit" value="Find it!" /></br>
+<input type="submit" value="Find it!" /><input type="submit" formaction="history.php" value="View history" /></br>
 </form>
 
 <h2>Track the fleet</h2>

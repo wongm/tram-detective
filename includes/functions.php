@@ -130,11 +130,17 @@ function getAllTramHistory($id)
 		$sighting->setTimezone($melbourneTimezone);
 		$formatteddate = $sighting->format('d/m/Y');
 		
+		if ($pastDate == "")
+		{
+			$routes[] = $row['routeNo'];
+		}
+		
 		if ($pastDate != $formatteddate)
 		{
 			$day = new stdClass;
 			$day->routes = join($routes, ", ");
 			$day->date = $formatteddate;
+			$day->order = $row['sighting'];
 			$history[] = $day;
 			$routes = [];
 		}
@@ -159,38 +165,56 @@ function drawTable($trams, $type)
 		$headers = "<tr><th>Tram</th><th>#</th>";
 		if ($type != 'stabled')
 		{
-			$headers .= "<th>Route</th><th>Towards</th><th>Last updated</th>";
+			$headers .= "<th>Route</th><th>Towards</th>";
+		}
+		
+		if ($type == 'stabled' || $type == 'all')
+		{
+			$headers .= "<th>Last seen</th>";
 		}
 		else
 		{
-			$headers .= "<th>Last seen</th>";
+			$headers .= "<th>Last updated</th>";
 		}
 		
 		echo "$headers<th data-sortable=\"false\"></th></tr></thead><tbody>";
 
 		foreach($trams as $tram){
 			$field = get_object_vars($tram); 
+			
+			// ignore trams no longer mapped to a class
+			if ($tram->class == '')
+				continue;
+			
 			echo "<tr>\r\n";
 			echo "<td>$tram->class</td>\r\n";
 			echo "<td>$tram->id</td>\r\n";
 
-			if ($type == 'stabled')
-			{
-				echo "<td data-value=\"" . $tram->order . "\">$tram->lastservice</td>\r\n";
-			}
-			else
+			if ($type != 'stabled')
 			{
 				echo "<td>$tram->routeNo</td>\r\n";
 				echo "<td>$tram->destination</td>\r\n";
-				echo "<td data-value=\"" . $tram->order . "\">$tram->lastupdated</td>\r\n";
 			}
 
-			if ($tram->routeNo == '')
+			if ($tram->routeNo == '' || $type == 'stabled')
 			{
+				if ($tram->lastservice == '')
+				{
+					$tram->lastservice = 'Never';
+					$tram->order = 0;
+				}
+				
+				echo "<td data-value=\"" . $tram->order . "\">$tram->lastservice</td>\r\n";
 				echo "<td><a href=\"history.php?id=" . $tram->id . "\">History</a></td>\r\n";
 			}
 			else
 			{
+				if ($type == 'all')
+				{
+					$tram->lastupdated = "In service";
+				}
+				
+				echo "<td data-value=\"" . $tram->order . "\">$tram->lastupdated</td>\r\n";
 				echo "<td><a href=\"tram.php?id=" . $tram->id . "\">Current location</a></td>\r\n";
 			}
 			echo "</tr>\r\n";
