@@ -16,6 +16,8 @@ require_once('includes/Header.php');
 <p><a href="table.php?type=active">List of all trams in service</a></p>
 <p><a href="table.php?type=offroute">List of all trams off their usual route</a></p>
 <p><a href="table.php?type=stabled">List of all trams stabled in depots</a></p>
+<h2>Tables</h2>
+<p><a href="table.php?type=all">All trams</a></p>
 <p><a href="fleet.php">Melbourne's tram fleet</a></p>
 <p><a href="routes.php">Tram fleet to route allocations</a></p>
 <?php

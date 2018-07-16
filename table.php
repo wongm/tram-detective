@@ -17,6 +17,10 @@ switch ($type)
 		$pageTitle = "Trams in service";
 		$trams = getAllActiveTrams();
 		break;
+	case 'all':
+		$pageTitle = "All trams";
+		$trams = getAllTrams();
+		break;
 }
 
 $pageDescription = "Tracking the trams of Melbourne";

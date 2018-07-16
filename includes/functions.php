@@ -27,6 +27,11 @@ function getLastUpdatedString()
 	return "Data between $minlastupdated and $maxlastupdated";
 }
 
+function getAllTrams()
+{
+	return getAllTramsInternal('all');
+}
+
 function getAllActiveTrams()
 {
 	return getAllTramsInternal('active');
@@ -57,6 +62,9 @@ function getAllTramsInternal($type)
 		case 'active':
 			$sqlWhere = 'lat != 0 AND lng != 0';
 			break;
+		case 'all':
+			$sqlWhere = '1=1';
+			break;
 	}
 
 	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE " . $sqlWhere;
@@ -76,12 +84,14 @@ function getAllTramsInternal($type)
 		$formattedlastupdated = $lastupdateddate->format('d/m/Y H:i');
 		
 		$formattedlastservice = "";
+		$order = $row['lastupdated'];
 		if (substr($row['lastservice'], 0, 4) != '0000')
 		{
 			$lastservicedate = new DateTime();
 			$lastservicedate->setTimestamp(strtotime($row['lastservice']));
 			$lastservicedate->setTimezone($melbourneTimezone);
 			$formattedlastservice = $lastservicedate->format('d/m/Y H:i');
+			$order = $row['lastservice'];
 		}
 
 		$tram = new stdClass;
@@ -91,10 +101,49 @@ function getAllTramsInternal($type)
 		$tram->destination = $row['destination'];
 		$tram->lastupdated = $formattedlastupdated;
 		$tram->lastservice = $formattedlastservice;
+		$tram->order = $order;
 		$trams[] = $tram;
 	}
 	
 	return $trams;
+}
+
+function getAllTramHistory($id)
+{
+	global $config, $mysqliConnection, $melbourneTimezone;
+	
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . "  GROUP BY `routeNo`, DATE(CONVERT_TZ(`sighting`,'+00:00','+10:00')) ORDER BY `sighting` DESC";
+	$result = $mysqliConnection->query($tableCheck);
+	
+	if ($result === false)
+	{
+		return null;
+	}
+
+	$history = [];
+	$routes = [];
+	$pastDate = "";
+	while($row = $result->fetch_assoc())
+	{
+		$sighting = new DateTime();
+		$sighting->setTimestamp(strtotime($row['sighting']));
+		$sighting->setTimezone($melbourneTimezone);
+		$formatteddate = $sighting->format('d/m/Y');
+		
+		if ($pastDate != $formatteddate)
+		{
+			$day = new stdClass;
+			$day->routes = join($routes, ", ");
+			$day->date = $formatteddate;
+			$history[] = $day;
+			$routes = [];
+		}
+		
+		$routes[] = $row['routeNo'];
+		$pastDate = $formatteddate;
+	}
+	
+	return $history;
 }
 
 function drawTable($trams, $type)
@@ -110,35 +159,41 @@ function drawTable($trams, $type)
 		$headers = "<tr><th>Tram</th><th>#</th>";
 		if ($type != 'stabled')
 		{
-			$headers .= "<th>Route</th><th>Towards</th><th>Last updated</th><th data-sortable=\"false\"></th>";
+			$headers .= "<th>Route</th><th>Towards</th><th>Last updated</th>";
 		}
 		else
 		{
 			$headers .= "<th>Last seen</th>";
 		}
 		
-		echo "$headers</tr></thead><tbody>";
+		echo "$headers<th data-sortable=\"false\"></th></tr></thead><tbody>";
 
 		foreach($trams as $tram){
 			$field = get_object_vars($tram); 
-			echo "<tr>";
-			foreach($field as $key => $value )
-			{
-				if (($type != 'stabled' && $key != "lastservice") || $key == "class" || $key == "id")
-				{
-					echo "<td>$value</td>";
-				}
-			}
-			
+			echo "<tr>\r\n";
+			echo "<td>$tram->class</td>\r\n";
+			echo "<td>$tram->id</td>\r\n";
+
 			if ($type == 'stabled')
 			{
-				echo "<td>$tram->lastservice</td>";
+				echo "<td data-value=\"" . $tram->order . "\">$tram->lastservice</td>\r\n";
 			}
 			else
 			{
-				echo "<td><a href=\"tram.php?id=" . $tram->id . "\">View current location</a></td>";
+				echo "<td>$tram->routeNo</td>\r\n";
+				echo "<td>$tram->destination</td>\r\n";
+				echo "<td data-value=\"" . $tram->order . "\">$tram->lastupdated</td>\r\n";
 			}
-			echo "</tr>";
+
+			if ($tram->routeNo == '')
+			{
+				echo "<td><a href=\"history.php?id=" . $tram->id . "\">History</a></td>\r\n";
+			}
+			else
+			{
+				echo "<td><a href=\"tram.php?id=" . $tram->id . "\">Current location</a></td>\r\n";
+			}
+			echo "</tr>\r\n";
 		}
 		echo "</tbody></table>";
 	}
