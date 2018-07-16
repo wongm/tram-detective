@@ -10,12 +10,7 @@ include_once('includes/melb-tram-fleet/routes.php');
 foreach ($tram_routes as $class => $routes)
 {
     echo "<li><p>$class class:</p><ul>";
-    
-    foreach ($routes as $route)
-    {
-        echo "<li>Route $route</a>";
-    }
-    
+    echo "<li><p>Routes " . join(', ', $routes) . "</p></li>";
     echo "</ul></li>";
 }
 ?>

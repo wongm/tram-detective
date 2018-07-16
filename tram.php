@@ -1,7 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-
 require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/ServiceData.php');
 

@@ -13,13 +13,17 @@ require_once('includes/Header.php');
 <h2>Track the fleet</h2>
 <p><a href="map.php">View location of all operational trams</a></p>
 <p><a href="map.php?type=offroute">View location of trams off their usual route</a></p>
-<p><a href="table.php?type=active">List of all trams in service</a></p>
-<p><a href="table.php?type=offroute">List of all trams off their usual route</a></p>
-<p><a href="table.php?type=stabled">List of all trams stabled in depots</a></p>
+
 <h2>Tables</h2>
 <p><a href="table.php?type=all">All trams</a></p>
+<p><a href="table.php?type=active">Trams in service</a></p>
+<p><a href="table.php?type=offroute">Trams off their usual route</a></p>
+<p><a href="table.php?type=stabled">Trams stabled in depots</a></p>
+
+<h2>Fleet listings</h2>
 <p><a href="fleet.php">Melbourne's tram fleet</a></p>
 <p><a href="routes.php">Tram fleet to route allocations</a></p>
+<p><a href="depots.php">Tram route to depot allocations</a></p>
 <?php
 require_once('includes/Footer.php');
 ?>
