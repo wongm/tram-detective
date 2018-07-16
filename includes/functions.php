@@ -112,7 +112,7 @@ function getAllTramHistory($id)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 	
-	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . "  GROUP BY `routeNo`, DATE(CONVERT_TZ(`sighting`,'+00:00','+10:00')) ORDER BY `sighting` DESC";
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . "  GROUP BY `routeNo`, `sighting_day` ORDER BY `sighting_day` DESC";
 	$result = $mysqliConnection->query($tableCheck);
 	
 	if ($result === false)

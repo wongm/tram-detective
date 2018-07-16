@@ -2,6 +2,7 @@
 require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/melb-tram-fleet/routes.php');
 require_once('includes/config.php');
+require_once('includes/functions.php');
 require_once('includes/ServiceRouteData.php');
 
 if (!isset($_GET['token']) || $_GET['token'] != $config['cron'])
@@ -25,6 +26,10 @@ while($row = $result->fetch_assoc())
 {
 	$tramNumber = $row['id'];
 	
+	// skip trams that don't have a class, we no longer care
+	if (getTramClass($tramNumber) == '')
+		continue;
+	
 	$serviceData = new ServiceRouteData($tramNumber, getTramClass($tramNumber), true);
 	$currentLat = $serviceData->currentLat;
 	$currentLon = $serviceData->currentLon;
@@ -40,15 +45,19 @@ while($row = $result->fetch_assoc())
 			$offUsualRoute = 0;
 		}
 		
+		$currentDay = new DateTime(date("Y-m-d"));
+		$currentDay->setTimezone($melbourneTimezone);
+		$timestamp = $currentDay->format('U');
+		
 		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `lastservice` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = '" . $destination . "', `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
 		$result3 = $mysqli->query($tableCheck);
-		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
+		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $timestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
 		$result2 = $mysqli->query($tableCheck);
 		$type = "LOCATION";
 	}
 	else
 	{
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
 		$result2 = $mysqli->query($tableCheck);
 		$type = "DATE";
 	}

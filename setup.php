@@ -34,6 +34,26 @@ if ($result->num_rows == 0)
 	echo "`lastservice` column added to `trams` table!<BR>";
 }
 
+$tableCheck = "SELECT * FROM information_schema.columns WHERE table_schema = '" . $config['dbName'] . "' AND table_name = 'trams_history' AND column_name = 'sighting_day' LIMIT 1;";
+$result = $mysqli->query($tableCheck);
+
+if ($result->num_rows == 0)
+{
+	$tableCreate = "ALTER TABLE `" . $config['dbName'] . "`.`trams_history` ADD COLUMN `sighting_day` INT(8) UNSIGNED AFTER `sighting`";
+	$result = $mysqli->query($tableCreate);
+	echo "`sighting_day` column added to `trams_history` table!<BR>";
+}
+
+$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `sighting_day` IS NULL;";
+$result = $mysqli->query($tableCheck);
+
+if ($result->num_rows > 0)
+{
+	$tableUpdate = "UPDATE `" . $config['dbName'] . "`.`trams_history` SET `sighting_day` = UNIX_TIMESTAMP(DATE(CONVERT_TZ(`sighting`,'+00:00','+10:00'))) WHERE `sighting_day` IS NULL";
+	$result = $mysqli->query($tableUpdate);
+	echo "Backfilled `sighting_day` column on `trams_history` table!<BR>";
+}
+
 require_once('includes/melb-tram-fleet/trams.php');
 
 foreach (array_keys($melbourne_trams) as $class)
