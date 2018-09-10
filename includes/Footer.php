@@ -1,5 +1,5 @@
 <div id="footer">
-Created by Marcus Wong - <?php echo date("Y"); ?> 
+Tram Detective. Marcus Wong <?php echo date("Y"); ?> 
 </div>
 </div>
 </body>

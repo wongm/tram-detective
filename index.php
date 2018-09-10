@@ -1,5 +1,5 @@
 <?php
-$pageTitle = "Gunzel Operations Center";
+$pageTitle = "Tram Detective";
 $pageDescription = "Tracking the trams of Melbourne";
 require_once('includes/Header.php');
 ?>
