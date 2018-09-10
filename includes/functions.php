@@ -101,6 +101,7 @@ function getAllTramsInternal($type)
 		$tram->destination = $row['destination'];
 		$tram->lastupdated = $formattedlastupdated;
 		$tram->lastservice = $formattedlastservice;
+		$tram->lastservicedate = $lastservicedate;;
 		$tram->order = $order;
 		$trams[] = $tram;
 	}
