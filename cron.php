@@ -27,8 +27,13 @@ while($row = $result->fetch_assoc())
 	$tramNumber = $row['id'];
 	
 	// skip trams that don't have a class, we no longer care
-	if (getTramClass($tramNumber) == '')
-		continue;
+	if (strlen(getTramClass($tramNumber)) === 0)
+	{
+	    echo "Skipped $tramNumber<BR>";
+		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$mysqli->query($tableCheck);
+    	continue;
+	}
 	
 	$serviceData = new ServiceRouteData($tramNumber, getTramClass($tramNumber), true);
 	$currentLat = $serviceData->currentLat;
@@ -36,7 +41,7 @@ while($row = $result->fetch_assoc())
 	$routeNo = (int)$serviceData->routeNo;
 	$offUsualRoute = $serviceData->offUsualRoute;
 	$destination = $serviceData->destination;
-	$direction = $serviceData->direction;
+	$direction = $serviceData->direction;	
 	
 	if ($currentLat != "" && $currentLon != "")
 	{
@@ -52,16 +57,16 @@ while($row = $result->fetch_assoc())
 		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `lastservice` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = '" . $destination . "', `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
 		$result3 = $mysqli->query($tableCheck);
 		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $timestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
-		$result2 = $mysqli->query($tableCheck);
+		$mysqli->query($tableCheck);
 		$type = "LOCATION";
 	}
 	else
 	{
 		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
-		$result2 = $mysqli->query($tableCheck);
+		$mysqli->query($tableCheck);
 		$type = "DATE";
 	}
 	echo "Updated $tramNumber $type<BR>";
 }
-
 ?>
+DONE
