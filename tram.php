@@ -1,9 +1,8 @@
 <?php
 
 require_once('includes/melb-tram-fleet/functions.php');
+require_once('includes/functions.php');
 require_once('includes/ServiceData.php');
-
-date_default_timezone_set("Australia/Melbourne");
 
 $tramNumber = (int) $_GET['id'];
 if (!is_numeric($tramNumber))
@@ -49,6 +48,7 @@ if(isset($serviceData->error))
 	}
 ?>
 <div class="<?php echo $errorclass ?>"><p><?php echo $errormessage ?></p></div>
+<p>Last seen on the network at <?php echo getLastServiceDate($tramNumber); ?></p>
 <?php
 
 drawViewHistoryLink($tramNumber);
@@ -71,6 +71,8 @@ else
 
     foreach ($serviceData->nextStops as $nextStop)
     {
+		date_default_timezone_set("Australia/Melbourne");
+		
     	// Convert to minutes, and round down
     	$predicted = strtotime($nextStop->PredictedArrivalDateTime);
     	$minutesuntil = floor(($predicted - $serviceData->currentTimestamp) / 60);

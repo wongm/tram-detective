@@ -16,7 +16,7 @@ function getLastUpdatedString()
 
 	$formattedprediction = new DateTime();
 	$formattedprediction->setTimestamp(strtotime($row['maxlastupdated']));
-	$formattedprediction->setTimezone($melbourneTimezone);	
+	$formattedprediction->setTimezone($melbourneTimezone);
 	$maxlastupdated = $formattedprediction->format('d/m/Y H:i');
 
 	$formattedprediction = new DateTime();
@@ -101,12 +101,30 @@ function getAllTramsInternal($type)
 		$tram->destination = $row['destination'];
 		$tram->lastupdated = $formattedlastupdated;
 		$tram->lastservice = $formattedlastservice;
-		$tram->lastservicedate = $lastservicedate;;
+		$tram->lastservicedate = $lastservicedate;
 		$tram->order = $order;
 		$trams[] = $tram;
 	}
 	
 	return $trams;
+}
+
+function getLastServiceDate($id)
+{
+	global $config, $mysqliConnection, $melbourneTimezone;
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE `id` = " . $id;
+	$result = $mysqliConnection->query($tableCheck);
+	
+	while($row = $result->fetch_assoc())
+	{
+		if (substr($row['lastservice'], 0, 4) != '0000')
+		{
+			$lastservicedate = new DateTime();
+			$lastservicedate->setTimestamp(strtotime($row['lastservice']));
+			$lastservicedate->setTimezone($melbourneTimezone);
+			return $lastservicedate->format('d/m/Y H:i');
+		}
+	}
 }
 
 function getAllTramHistory($id)
