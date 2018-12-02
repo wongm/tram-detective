@@ -24,6 +24,12 @@ require_once('includes/Header.php');
 <p><a href="fleet.php">Melbourne's tram fleet</a></p>
 <p><a href="routes.php">Tram fleet to route allocations</a></p>
 <p><a href="depots.php">Tram route to depot allocations</a></p>
+
+<h2>Social media</h2>
+<p>Get alerted when trams are off their usual route!</p>
+<p><a href="https://twitter.com/tramdetective">Twitter</a></p>
+<p><a href="https://www.facebook.com/Tram-Detective-717904228558350/">Facebook</a></p>
+<p><a href="feed.php">RSS feed</a></p>
 <?php
 require_once('includes/Footer.php');
 ?>
