@@ -59,7 +59,7 @@ $result = $mysqli->query($tableCheck);
 
 if ($result->num_rows == 0)
 {
-	$tableCreate = "CREATE TABLE `" . $config['dbName'] . "`.`trams_history_for_day` ( `id` INT NOT NULL AUTO_INCREMENT , PRIMARY KEY (`id`), tramid INT NOT NULL, routeNo INT NOT NULL, sighting_day INT(8) NOT NULL )";
+	$tableCreate = "CREATE TABLE `" . $config['dbName'] . "`.`trams_history_for_day` ( `id` INT NOT NULL AUTO_INCREMENT , PRIMARY KEY (`id`), tramid INT NOT NULL, routeNo INT NOT NULL, sighting_day INT(8) NOT NULL, ADD CONSTRAINT UC_composite UNIQUE (tramid, routeNo, sighting_day); )";
 	$result = $mysqli->query($tableCreate);
 	echo "`trams_history_for_day` table created!<BR>";
 }
