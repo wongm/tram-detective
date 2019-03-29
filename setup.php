@@ -54,6 +54,16 @@ if ($result->num_rows > 0)
 	echo "Backfilled `sighting_day` column on `trams_history` table!<BR>";
 }
 
+$tableCheck = "SELECT * FROM information_schema.tables WHERE table_schema = '" . $config['dbName'] . "' AND table_name = 'trams_history_for_day' LIMIT 1;";
+$result = $mysqli->query($tableCheck);
+
+if ($result->num_rows == 0)
+{
+	$tableCreate = "CREATE TABLE `" . $config['dbName'] . "`.`trams_history_for_day` ( `id` INT NOT NULL , PRIMARY KEY (`id`), tramid INT NOT NULL, routeNo INT NOT NULL, sighting_day INT(8) NOT NULL )";
+	$result = $mysqli->query($tableCreate);
+	echo "`trams_history_for_day` table created!<BR>";
+}
+
 require_once('includes/melb-tram-fleet/trams.php');
 
 foreach (array_keys($melbourne_trams) as $class)
