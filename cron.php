@@ -30,8 +30,8 @@ while($row = $result->fetch_assoc())
 	if (strlen(getTramClass($tramNumber)) === 0)
 	{
 	    echo "Skipped $tramNumber<BR>";
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
-		$mysqli->query($tableCheck);
+		$updateSkippedSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$mysqli->query($updateSkippedSql);
     	continue;
 	}
 	
@@ -52,18 +52,22 @@ while($row = $result->fetch_assoc())
 		
 		$currentDay = new DateTime(date("Y-m-d H:i:s"));
 		$currentDay->setTimezone($melbourneTimezone);
-		$timestamp = $currentDay->format('U');
+		$currentDate = new DateTime($currentDay->format('Y-m-d'));
+		$unixTimestamp = $currentDate->format('U');
+		$dateISO = $currentDate->format('Ymd');
 		
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `lastservice` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = '" . $destination . "', `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
-		$result3 = $mysqli->query($tableCheck);
-		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $timestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
-		$mysqli->query($tableCheck);
+		$updateTramLocationSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `lastservice` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = '" . $destination . "', `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
+		$mysqli->query($updateTramLocationSql);
+		$insertTramHistorySql = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $unixTimestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
+		$mysqli->query($insertTramHistorySql);
+		$insertTramHistoryDaySql = "INSERT IGNORE INTO `" . $config['dbName'] . "`.`trams_history_for_day` (`tramid`, `routeNo`, `sighting_day`) VALUES (" . $tramNumber . ", " . $routeNo . ", " . $dateISO . ")";
+		$mysqli->query($insertTramHistoryDaySql);
 		$type = "LOCATION";
 	}
 	else
 	{
-		$tableCheck = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
-		$mysqli->query($tableCheck);
+		$updateDateSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		$mysqli->query($updateDateSql);
 		$type = "DATE";
 	}
 	echo "Updated $tramNumber $type<BR>";
