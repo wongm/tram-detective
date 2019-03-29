@@ -22,7 +22,7 @@ $pageTitle = "Tram " . getTramClassAndNumber($tramNumber);
 $pageDescription = "Tracking tram " . getTramClassAndNumber($tramNumber) . " around Melbourne";
 require_once('includes/Header.php');
 
-$history = getAllTramHistory($tramNumber, isset($_GET['new']));
+$history = getAllTramHistory($tramNumber);
 
 echo "<p><a href=\"tram.php?id=" . $tramNumber . "\">View current location</a></p>";
 

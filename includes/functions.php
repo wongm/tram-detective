@@ -127,20 +127,11 @@ function getLastServiceDate($id)
 	}
 }
 
-function getAllTramHistory($id, $newMode)
+function getAllTramHistory($id)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 	
-	if ($newMode)
-	{
-		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history_for_day` WHERE `tramid` = " . $id . " ORDER BY `sighting_day` DESC";
-	}
-	else
-	{
-		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . "  GROUP BY `routeNo`, `sighting_day` ORDER BY `sighting_day` DESC";
-	}
-	
-	
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history_for_day` WHERE `tramid` = " . $id . " ORDER BY `sighting_day` DESC, routeNo ASC";
 	$result = $mysqliConnection->query($tableCheck);
 	
 	if ($result === false)
@@ -153,21 +144,9 @@ function getAllTramHistory($id, $newMode)
 	$pastDate = "";
 	while($row = $result->fetch_assoc())
 	{
-		if ($newMode)
-		{
-			$sighting = new DateTime();
-			$sighting->setTimestamp(strtotime($row['sighting_day']));
-			$formatteddate = $sighting->format('d/m/Y');
-			$order = $row['sighting_day'];
-		}
-		else
-		{
-			$sighting = new DateTime();
-			$sighting->setTimestamp(strtotime($row['sighting']));
-			$sighting->setTimezone($melbourneTimezone);
-			$formatteddate = $sighting->format('d/m/Y');
-			$order = $row['sighting'];
-		}
+		$sighting = new DateTime();
+		$sighting->setTimestamp(strtotime($row['sighting_day']));
+		$formatteddate = $sighting->format('d/m/Y');
 		
 		if ($pastDate == "")
 		{
@@ -179,7 +158,7 @@ function getAllTramHistory($id, $newMode)
 			$day = new stdClass;
 			$day->routes = join($routes, ", ");
 			$day->date = $formatteddate;
-			$day->order = $order;
+			$day->order = $row['sighting_day'];
 			$history[] = $day;
 			$routes = [];
 		}
