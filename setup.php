@@ -49,7 +49,7 @@ $result = $mysqli->query($tableCheck);
 
 if ($result->num_rows > 0)
 {
-	$tableUpdate = "UPDATE `" . $config['dbName'] . "`.`trams_history` SET `sighting_day` = UNIX_TIMESTAMP(DATE(CONVERT_TZ(`sighting`,'+00:00','+10:00'))) WHERE `sighting_day` IS NULL";
+	$tableUpdate = "UPDATE `" . $config['dbName'] . "`.`trams_history` SET `sighting_day` = UNIX_TIMESTAMP(DATE(CONVERT_TZ(`sighting`,'-04:00','+10:00'))) WHERE `sighting_day` IS NULL";
 	$result = $mysqli->query($tableUpdate);
 	echo "Backfilled `sighting_day` column on `trams_history` table!<BR>";
 }
