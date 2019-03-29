@@ -139,32 +139,24 @@ function getAllTramHistory($id)
 		return null;
 	}
 
-	$history = [];
-	$routes = [];
-	$pastDate = "";
+	$history = array();
 	while($row = $result->fetch_assoc())
 	{
+		$day = $row['sighting_day'];
+		
+		if (!isset($history[$day]))
+		{
+			$history[$day] = new stdClass;
+			$history[$day]->routes = array();
+		}
+		
 		$sighting = new DateTime();
-		$sighting->setTimestamp(strtotime($row['sighting_day']));
-		$formatteddate = $sighting->format('d/m/Y');
+		$sighting->setTimestamp(strtotime($day));
+		$formattedDate = $sighting->format('d/m/Y');
 		
-		if ($pastDate == "")
-		{
-			$routes[] = $row['routeNo'];
-		}
-		
-		if ($pastDate != $formatteddate)
-		{
-			$day = new stdClass;
-			$day->routes = join($routes, ", ");
-			$day->date = $formatteddate;
-			$day->order = $row['sighting_day'];
-			$history[] = $day;
-			$routes = [];
-		}
-		
-		$routes[] = $row['routeNo'];
-		$pastDate = $formatteddate;
+		array_push($history[$day]->routes, $row['routeNo']);
+		$history[$day]->date = $formattedDate;
+		$history[$day]->order = $day;
 	}
 	
 	return $history;
@@ -272,20 +264,20 @@ function array2csv(array &$array)
 
 function download_send_headers($filename)
 {
-    // disable caching
-    $now = gmdate("D, d M Y H:i:s");
-    header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
-    header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
-    header("Last-Modified: {$now} GMT");
+	// disable caching
+	$now = gmdate("D, d M Y H:i:s");
+	header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+	header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+	header("Last-Modified: {$now} GMT");
 
-    // force download  
-    header("Content-Type: application/force-download");
-    header("Content-Type: application/octet-stream");
-    header("Content-Type: application/download");
+	// force download  
+	header("Content-Type: application/force-download");
+	header("Content-Type: application/octet-stream");
+	header("Content-Type: application/download");
 
-    // disposition / encoding on response body
-    header("Content-Disposition: attachment;filename={$filename}");
-    header("Content-Transfer-Encoding: binary");
+	// disposition / encoding on response body
+	header("Content-Disposition: attachment;filename={$filename}");
+	header("Content-Transfer-Encoding: binary");
 }
 
 ?>
