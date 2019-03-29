@@ -50,7 +50,7 @@ while($row = $result->fetch_assoc())
 			$offUsualRoute = 0;
 		}
 		
-		$currentDay = new DateTime(date("Y-m-d"));
+		$currentDay = new DateTime(date("Y-m-d H:i:s"));
 		$currentDay->setTimezone($melbourneTimezone);
 		$timestamp = $currentDay->format('U');
 		
