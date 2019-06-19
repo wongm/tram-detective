@@ -10,6 +10,13 @@ require_once('includes/Header.php');
 <input type="submit" value="Find it!" /><input type="submit" formaction="history.php" value="View history" /></br>
 </form>
 
+<h2>By route</h2>
+<form action="route.php" method="get">
+<label for="id">Route number</label>
+<input type="number" id="id" name="id" maxlength="4" size="4" />
+<input type="submit" value="View history" /></br>
+</form>
+
 <h2>Track the fleet</h2>
 <p><a href="map.php">View location of all operational trams</a></p>
 <p><a href="map.php?type=offroute">View location of trams off their usual route</a></p>

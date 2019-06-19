@@ -127,6 +127,62 @@ function getLastServiceDate($id)
 	}
 }
 
+function getAllRouteHistory($route)
+{
+    global $config, $mysqliConnection, $melbourneTimezone;
+	
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history_for_day` WHERE `routeNo` = " . $route . " ORDER BY `sighting_day` DESC, tramid ASC";
+	$result = $mysqliConnection->query($tableCheck);
+	
+	if ($result === false)
+	{
+		return null;
+	}
+
+	$history = array();
+	while($row = $result->fetch_assoc())
+	{
+		$day = $row['sighting_day'];
+		
+		if (!isset($history[$day]))
+		{
+			$history[$day] = new stdClass;
+			$history[$day]->trams = array();
+			$history[$day]->airconCount = 0;
+			$history[$day]->lowFloorCount = 0;
+			$history[$day]->totalCount = 0;
+		}
+		
+		$sighting = new DateTime();
+		$sighting->setTimestamp(strtotime($day));
+		$formattedDate = $sighting->format('d/m/Y');
+		
+		$tramId = $row['tramid'];
+		array_push($history[$day]->trams, $tramId);
+		$history[$day]->date = $formattedDate;
+		$history[$day]->timestamp = $sighting->getTimestamp() * 1000;
+		$history[$day]->order = $day;
+		$history[$day]->totalCount++;
+		
+		if (getTramAirConditioned($tramId))
+		{
+    		$history[$day]->airconCount++;
+		}
+		if (getTramLowFloor($tramId))
+		{
+    		$history[$day]->lowFloorCount++;
+		}
+		
+	    $history[$day]->lowFloorPercent = round(($history[$day]->lowFloorCount / $history[$day]->totalCount) * 100, 0);
+	    $history[$day]->airconPercent = round(($history[$day]->airconCount / $history[$day]->totalCount) * 100, 0);
+	    
+	    $history[$day]->nonLowFloorCount = $history[$day]->totalCount - $history[$day]->lowFloorCount;
+	    $history[$day]->nonAirconCount = $history[$day]->totalCount - $history[$day]->airconCount;
+	}
+	
+	return $history;
+}
+
 function getAllTramHistory($id)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
