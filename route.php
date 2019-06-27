@@ -71,7 +71,7 @@ jQuery(document).ready(function() {
         tooltip: {
             shared: true,
             formatter: function() {
-                var s = '<b>'+ Highcharts.dateFormat('%B %Y', this.x) +'</b>';
+                var s = '<b>'+ Highcharts.dateFormat('%d %B %Y', this.x) +'</b>';
                 var sum = 0;
                 jQuery.each(this.points, function(i, point) {
                     s += '<br/><span style=\"color:' + point.series.color + '\">' + point.series.name + 
