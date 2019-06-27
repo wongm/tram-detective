@@ -21,7 +21,7 @@ if (isset($_GET['mode']) && $_GET['mode'] == 'fleet')
 else if (isset($_GET['mode']) && $_GET['mode'] == 'table')
 {
     $mode = 'table';
-    $tableHeader = "<table class=\"sortable-theme-bootstrap\" data-sortable><thead><tr><th>Date</th><th>Air conditioned %</th><th>Low floor %</th></tr></thead><tbody>";
+    $tableHeader = "<table class=\"sortable-theme-bootstrap\" data-sortable><thead><tr><th>Date</th><th>Low floor %</th><th>Air conditioned %</th></tr></thead><tbody>";
 }
 
 $pageTitle = "Trams on route " . $route;
