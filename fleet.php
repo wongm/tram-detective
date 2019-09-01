@@ -8,14 +8,14 @@ include_once('includes/melb-tram-fleet/functions.php');
 <p>Search for tram photos at <a href="http://railgallery.wongm.com/">http://railgallery.wongm.com/</a>.</p>
 <ul>
 <?php
-foreach ($melbourne_trams as $class => $trams)
+foreach ($melbourne_trams as $class => $classData)
 {
     echo "<li><p>$class class:</p><ul>";
     
-    foreach ($trams as $tram_number)
+    foreach ($classData['trams'] as $tram_number)
     {
         $tram = $class . '.' . $tram_number;
-        echo '<li><a href="https://railgallery.wongm.com/page/search/' . $tram . '">' . $tram . '</a>';
+        echo '<li><a href="http://railgallery.wongm.com/page/search/' . $tram . '">' . $tram . '</a>';
     }
     
     echo "</ul></li>";
