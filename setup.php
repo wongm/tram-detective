@@ -66,25 +66,26 @@ if ($result->num_rows == 0)
 
 require_once('includes/melb-tram-fleet/trams.php');
 
-foreach (array_keys($melbourne_trams) as $class)
+foreach ($melbourne_trams as $class => $classData)
 {
-	foreach ($melbourne_trams[$class] as $tramNumber)
+	foreach ($classData['trams'] as $tram_number)
 	{
-		checkOrInsertTramNumber($mysqli, $config, $tramNumber);
+		checkOrInsertTramNumber($mysqli, $config, $tram_number);
 	}
 }
 
 echo "Insert complete";
 
-function checkOrInsertTramNumber($mysqli, $config, $tramNumber)
+function checkOrInsertTramNumber($mysqli, $config, $tram_number)
 {
-	$tableCheck = "SELECT id FROM `" . $config['dbName'] . "`.`trams` WHERE id = " . $tramNumber;
+	$tableCheck = "SELECT id FROM `" . $config['dbName'] . "`.`trams` WHERE id = " . $tram_number;
 	$result = $mysqli->query($tableCheck);
 	if ($result->num_rows == 0)
 	{
-		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams` (id, lastupdated) VALUES (" . $tramNumber . ", NOW())";
+		$tableCheck = "INSERT INTO `" . $config['dbName'] . "`.`trams` (id, lastupdated, lastservice, lat, lng) VALUES (" . $tram_number . ", NOW(), '0000-00-00 00:00:00', 0.00000000, 0.00000000)";
+		echo $tableCheck . "<BR>";
 		$result = $mysqli->query($tableCheck);
-		echo "Inserted $tramNumber<BR>";
+		echo "Inserted $tram_number<BR>";
 	}
 }
 ?>
