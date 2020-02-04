@@ -6,6 +6,11 @@ require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/functions.php');
 
 $tramNumber = (int) $_GET['id'];
+$dump = "";
+if (array_key_exists('dump', $_GET))
+{
+	$dump = $_GET['dump'];
+}
 if (!is_numeric($tramNumber))
 {
 	drawErrorPage($tramNumber);
@@ -22,7 +27,7 @@ $pageTitle = "Tram " . getTramClassAndNumber($tramNumber);
 $pageDescription = "Tracking tram " . getTramClassAndNumber($tramNumber) . " around Melbourne";
 require_once('includes/Header.php');
 
-$history = getAllTramHistory($tramNumber);
+$history = getAllTramHistory($tramNumber, $dump);
 
 echo "<p><a href=\"tram.php?id=" . $tramNumber . "\">View current location</a></p>";
 

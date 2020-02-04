@@ -183,11 +183,18 @@ function getAllRouteHistory($route)
 	return $history;
 }
 
-function getAllTramHistory($id)
+function getAllTramHistory($id, $dump)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 	
-	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history_for_day` WHERE `tramid` = " . $id . " ORDER BY `sighting_day` DESC, routeNo ASC";
+	if ($dump)
+	{
+		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . " ORDER BY `sighting` DESC, routeNo ASC";
+	}
+	else
+	{
+		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history_for_day` WHERE `tramid` = " . $id . " ORDER BY `sighting_day` DESC, routeNo ASC";
+	}
 	$result = $mysqliConnection->query($tableCheck);
 	
 	if ($result === false)
@@ -198,22 +205,38 @@ function getAllTramHistory($id)
 	$history = array();
 	while($row = $result->fetch_assoc())
 	{
-		$day = $row['sighting_day'];
-		
-		if (!isset($history[$day]))
+		if ($dump)
 		{
+			$day = $row['sighting'];
+			$sighting = new DateTime();
+			$sighting->setTimestamp(strtotime($day));
+			$sighting->setTimezone($melbourneTimezone);
+			
 			$history[$day] = new stdClass;
 			$history[$day]->routes = array();
+			array_push($history[$day]->routes, $row['routeNo']);
+			$history[$day]->date = $sighting->format('d/m/Y H:i');
+			$history[$day]->order = $day;
 		}
-		
-		$sighting = new DateTime();
-		$sighting->setTimestamp(strtotime($day));
-		$formattedDate = $sighting->format('d/m/Y');
-		
-		array_push($history[$day]->routes, $row['routeNo']);
-		$history[$day]->date = $formattedDate;
-		$history[$day]->order = $day;
-	}
+		else
+		{
+			$day = $row['sighting_day'];
+			
+			if (!isset($history[$day]))
+			{
+				$history[$day] = new stdClass;
+				$history[$day]->routes = array();
+			}
+			
+			$sighting = new DateTime();
+			$sighting->setTimestamp(strtotime($day));
+			$formattedDate = $sighting->format('d/m/Y');
+			
+			array_push($history[$day]->routes, $row['routeNo']);
+			$history[$day]->date = $formattedDate;
+			$history[$day]->order = $day;
+		}
+		}
 	
 	return $history;
 }
