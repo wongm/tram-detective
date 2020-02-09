@@ -6,7 +6,7 @@ require_once('includes/melb-tram-fleet/functions.php');
 $mysqliConnection = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 $melbourneTimezone = new DateTimeZone('Australia/Melbourne');
 
-function getLastUpdatedString()
+function getLastUpdatedData()
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 
@@ -17,14 +17,22 @@ function getLastUpdatedString()
 	$formattedprediction = new DateTime();
 	$formattedprediction->setTimestamp(strtotime($row['maxlastupdated']));
 	$formattedprediction->setTimezone($melbourneTimezone);
-	$maxlastupdated = $formattedprediction->format('d/m/Y H:i');
+	$maxlastupdated = $formattedprediction->format('d/m/Y H:i:s');
 
 	$formattedprediction = new DateTime();
 	$formattedprediction->setTimestamp(strtotime($row['minlastupdated']));
 	$formattedprediction->setTimezone($melbourneTimezone);
-	$minlastupdated = $formattedprediction->format('d/m/Y H:i');
-	
-	return "Data between $minlastupdated and $maxlastupdated";
+	$minlastupdated = $formattedprediction->format('d/m/Y H:i:s');
+
+	$data['maxlastupdated'] = $maxlastupdated;
+	$data['minlastupdated'] = $minlastupdated;
+	return $data;
+}
+
+function getLastUpdatedString()
+{
+	$data = getLastUpdatedData();
+	return "Data between " . $data['minlastupdated'] . " and " . $data['maxlastupdated'];
 }
 
 function getAllTrams()

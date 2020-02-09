@@ -5,6 +5,7 @@ header('Content-Type: application/json');
 require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/melb-tram-fleet/routes.php');
 require_once('includes/config.php');
+require_once('includes/functions.php');
 require_once('includes/ServiceRouteData.php');
 $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 
@@ -33,25 +34,12 @@ while($row = $result->fetch_assoc())
 	$trams[] = $tram;
 }
 
-
-$tableCheck = "SELECT max(lastupdated) AS `maxlastupdated`, min(lastupdated) AS `minlastupdated` FROM `" . $config['dbName'] . "`.`trams` WHERE lat != 0 AND lng != 0";
-$result = $mysqli->query($tableCheck);
-$row = $result->fetch_assoc();
-
-$formattedprediction = new DateTime();
-$formattedprediction->setTimestamp(strtotime($row['maxlastupdated']));
-$formattedprediction->setTimezone($melbournetimezone);	
-$maxlastupdated = $formattedprediction->format('d/m/Y H:i');
-
-$formattedprediction = new DateTime();
-$formattedprediction->setTimestamp(strtotime($row['minlastupdated']));
-$formattedprediction->setTimezone($melbournetimezone);
-$minlastupdated = $formattedprediction->format('d/m/Y H:i');
-
 $data['trams'] = $trams;
-$data['maxlastupdated'] = $maxlastupdated;
-$data['minlastupdated'] = $minlastupdated;
-	
+
+$lastUpdates = getLastUpdatedData();
+$data['maxlastupdated'] = $lastUpdates['maxlastupdated'];
+$data['minlastupdated'] = $lastUpdates['minlastupdated'];
+
 echo json_encode($data);
 
 ?>
