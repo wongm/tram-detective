@@ -5,11 +5,19 @@ ini_set('display_errors', 1);
 require_once('includes/melb-tram-fleet/functions.php');
 require_once('includes/functions.php');
 
+$historyType = "History summary";
 $tramNumber = (int) $_GET['id'];
-$dump = "";
-if (array_key_exists('dump', $_GET))
+
+$extended = $complete = false;
+if (array_key_exists('extended', $_GET))
 {
-	$dump = $_GET['dump'];
+	$historyType = "Recent history";
+	$extended = true;
+}
+if (array_key_exists('complete', $_GET))
+{
+	$historyType = "Complete history";
+	$complete = true;
 }
 if (!is_numeric($tramNumber))
 {
@@ -23,13 +31,13 @@ if (getTramClassAndNumber($tramNumber) == null)
 	die();
 }
 
-$pageTitle = "Tram " . getTramClassAndNumber($tramNumber);
+$pageTitle = "Tram " . getTramClassAndNumber($tramNumber) . " - " . $historyType;
 $pageDescription = "Tracking tram " . getTramClassAndNumber($tramNumber) . " around Melbourne";
 require_once('includes/Header.php');
 
-$history = getAllTramHistory($tramNumber, $dump);
+$history = getAllTramHistory($tramNumber, $extended, $complete);
 
-echo "<p><a href=\"tram.php?id=" . $tramNumber . "\">View current location</a></p>";
+drawViewHistoryLink($tramNumber);
 
 echo "<table class=\"sortable-theme-bootstrap\" data-sortable><thead><tr><th>Date</th><th>Routes</th></tr></thead><tbody>";
 foreach($history as $day)

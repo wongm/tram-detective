@@ -191,13 +191,19 @@ function getAllRouteHistory($route)
 	return $history;
 }
 
-function getAllTramHistory($id, $dump)
+function getAllTramHistory($id, $extended, $complete)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 	
-	if ($dump)
+	if ($extended || $complete)
 	{
-		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . " ORDER BY `sighting` DESC, routeNo ASC";
+		$limit = "";
+		if ($extended)
+		{
+			$limit = " LIMIT 100";
+		}
+		
+		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . " ORDER BY `id` DESC" . $limit;
 	}
 	else
 	{
@@ -213,7 +219,7 @@ function getAllTramHistory($id, $dump)
 	$history = array();
 	while($row = $result->fetch_assoc())
 	{
-		if ($dump)
+		if ($extended || $complete)
 		{
 			$day = $row['sighting'];
 			$sighting = new DateTime();
@@ -365,6 +371,14 @@ function download_send_headers($filename)
 	// disposition / encoding on response body
 	header("Content-Disposition: attachment;filename={$filename}");
 	header("Content-Transfer-Encoding: binary");
+}
+
+function drawViewHistoryLink($tramNumber)
+{
+	echo "<p><a href=\"tram.php?id=" . $tramNumber . "\">View current location</a> - ";
+	echo "<a href=\"history.php?id=" . $tramNumber . "\">Service history</a> - ";
+	echo "<a href=\"history.php?id=" . $tramNumber . "&extended=\">Recent movements</a> - ";
+	echo "<a href=\"history.php?id=" . $tramNumber . "&complete=\">Complete history</a></p>";
 }
 
 ?>

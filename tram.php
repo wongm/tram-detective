@@ -93,11 +93,6 @@ else
 <?php
 require_once('includes/Footer.php');
 
-function drawViewHistoryLink($tramNumber)
-{
-	echo "<p><a href=\"history.php?id=" . $tramNumber . "\">View service history</a></p>";
-}
-
 function drawErrorPage($tramNumber)
 {
 	$pageTitle = "Tram " . $tramNumber;
