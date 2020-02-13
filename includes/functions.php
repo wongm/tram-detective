@@ -6,6 +6,45 @@ require_once('includes/melb-tram-fleet/functions.php');
 $mysqliConnection = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 $melbourneTimezone = new DateTimeZone('Australia/Melbourne');
 
+function getQualityData()
+{
+	global $config, $mysqliConnection, $melbourneTimezone;
+	
+	$tableCheck = "SELECT min(sighting) AS `minsighting` FROM `" . $config['dbName'] . "`.`trams_history`";
+	$result = $mysqliConnection->query($tableCheck);
+	$row = $result->fetch_assoc();
+
+	$formattedprediction = new DateTime();
+	$formattedprediction->setTimestamp(strtotime($row['minsighting']));
+	$formattedprediction->setTimezone($melbourneTimezone);
+	$minsighting = $formattedprediction->format('d/m/Y H:i:s');
+
+	$data['minsighting'] = $minsighting;
+	
+	$tableCheck = "SELECT sighting_day FROM `" . $config['dbName'] . "`.`trams_history_for_day` GROUP BY `sighting_day`";
+	$result = $mysqliConnection->query($tableCheck);
+	
+	$lastDate = $minsighting = $formattedprediction->format('Ymd');
+	while($row = $result->fetch_assoc())
+	{
+		$day = $row['sighting_day'];
+		
+		if ($lastDate != $day)
+		{
+			$gapDate = new DateTime();
+			$gapDate->setTimestamp(strtotime($day));
+			$data['missingdata'][$day] = $gapDate->format('d/m/Y');
+		}
+		
+		$tomorrow = new DateTime();
+		$tomorrow->setTimestamp(strtotime($day));
+		$tomorrow->add(new DateInterval('P1D'));
+		$lastDate = $tomorrow->format('Ymd');
+	}
+	
+	return $data;
+}
+
 function getLastUpdatedData()
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
@@ -32,7 +71,7 @@ function getLastUpdatedData()
 function getLastUpdatedString()
 {
 	$data = getLastUpdatedData();
-	return "Data between " . $data['minlastupdated'] . " and " . $data['maxlastupdated'];
+	return "Current data between " . $data['minlastupdated'] . " and " . $data['maxlastupdated'];
 }
 
 function getAllTrams()

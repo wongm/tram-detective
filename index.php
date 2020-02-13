@@ -32,6 +32,10 @@ require_once('includes/Header.php');
 <p><a href="routes.php">Tram fleet to route allocations</a></p>
 <p><a href="depots.php">Tram route to depot allocations</a></p>
 
+
+<h2>About</h2>
+<p><a href="quality.php">Data quality</a></p>
+
 <h2>Social media</h2>
 <p>Get alerted when trams are off their usual route!</p>
 <p><a href="https://twitter.com/tramdetective">Twitter</a></p>
