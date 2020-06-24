@@ -49,7 +49,7 @@ function getLastUpdatedData()
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 
-	$tableCheck = "SELECT max(lastupdated) AS `maxlastupdated`, min(lastupdated) AS `minlastupdated` FROM `" . $config['dbName'] . "`.`trams` WHERE lat != 0 AND lng != 0";
+	$tableCheck = "SELECT max(lastupdated) AS `maxlastupdated`, min(lastupdated) AS `minlastupdated` FROM `" . $config['dbName'] . "`.`trams`";
 	$result = $mysqliConnection->query($tableCheck);
 	$row = $result->fetch_assoc();
 
