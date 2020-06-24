@@ -17,7 +17,7 @@ class ServiceRouteData extends Persistent
 
 	function __construct($tramNumber, $tramClass, $forceRefresh)
 	{
-		// Enable persistance if required
+		// Enable persistence if required
 		parent::__construct("cache/service/tram$tramNumber.ser");
 
 		// try to load data
@@ -32,10 +32,10 @@ class ServiceRouteData extends Persistent
 		// Now the heavy lifting
 		$serviceData = new ServiceData($tramNumber, $tramClass);
 		
-		if(isset($serviceData->error))
+		if(isset($serviceData->error) && $serviceData->error == 'apierror')
 		{
 			$this->error = $serviceData->error;
-			return;
+			return $this;
 		}
 
 		// Map the data back
