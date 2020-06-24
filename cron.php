@@ -48,18 +48,21 @@ function runShortLocalDbQuery($mysqli, $config)
 			continue;
 		}
 		
-		$ch = curl_init();
-
-		// set url
-		curl_setopt($ch, CURLOPT_URL, "https://tramdetective.wongm.com/cron.php?token=" & $_GET['token'] & "&id=" & $tramNumber);
-
-		//return the transfer as a string
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-		// $output contains the output string
-		$output = curl_exec($ch);
-
-		// close curl resource to free up system resources
+		$url = "https://tramdetective.wongm.com/cron.php?token=" . $_GET['token'] . "&id=" . $tramNumber;
+		
+		
+		$ch = curl_init($url);
+		curl_setopt_array($ch, array(
+			CURLOPT_HEADER => 0,
+			CURLOPT_RETURNTRANSFER =>true,
+			CURLOPT_NOSIGNAL => 1, //to timeout immediately if the value is < 1000 ms
+			CURLOPT_TIMEOUT_MS => 50, //The maximum number of mseconds to allow cURL functions to execute
+			CURLOPT_VERBOSE => 1,
+			CURLOPT_HEADER => 1
+		));
+		$out = curl_exec($ch);
+		
+		echo "Hit $url<BR>";
 		curl_close($ch);
 	}
 }
