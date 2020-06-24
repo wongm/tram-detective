@@ -6,44 +6,89 @@ require_once('includes/functions.php');
 require_once('includes/ServiceRouteData.php');
 
 if (!isset($_GET['token']) || $_GET['token'] != $config['cron'])
+{
 	die();
+}
 
 $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 
 error_reporting(E_ALL); 
 ini_set('display_errors', 1);
 
-$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE lastupdated < (NOW() - INTERVAL 10 MINUTE) ORDER BY lastupdated ASC LIMIT 0, 20";
-$result = $mysqli->query($tableCheck);
-
-if ($result === false)
+if (isset($_GET['id']) && is_numeric($_GET['id']))
 {
-	echo "Initialise database";
-	die();
+	runLongRemoteApiQuery($_GET['id'], $mysqli, $config, $melbourneTimezone);
+}
+else
+{
+	runShortLocalDbQuery($mysqli, $config);
 }
 
-while($row = $result->fetch_assoc())
+function runShortLocalDbQuery($mysqli, $config)
 {
-	$tramNumber = $row['id'];
-	
-	// skip trams that don't have a class, we no longer care
-	if (strlen(getTramClass($tramNumber)) === 0)
+	$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE lastupdated < (NOW() - INTERVAL 10 MINUTE) ORDER BY lastupdated ASC LIMIT 0, 40";
+	$result = $mysqli->query($tableCheck);
+
+	if ($result === false)
 	{
-	    echo "Skipped $tramNumber<BR>";
-		$updateSkippedSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
-		$mysqli->query($updateSkippedSql);
-    	continue;
+		echo "Initialise database";
+		die();
 	}
-	
+
+	while($row = $result->fetch_assoc())
+	{
+		$tramNumber = $row['id'];
+		
+		// skip trams that don't have a class, we no longer care
+		if (strlen(getTramClass($tramNumber)) === 0)
+		{
+			echo "Skipped $tramNumber<BR>";
+			$updateSkippedSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
+			$mysqli->query($updateSkippedSql);
+			continue;
+		}
+		
+		$ch = curl_init();
+
+		// set url
+		curl_setopt($ch, CURLOPT_URL, "https://tramdetective.wongm.com/cron.php?token=" & $_GET['token'] & "&id=" & $tramNumber);
+
+		//return the transfer as a string
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		// $output contains the output string
+		$output = curl_exec($ch);
+
+		// close curl resource to free up system resources
+		curl_close($ch);
+	}
+}
+
+function runLongRemoteApiQuery($tramNumber, $mysqli, $config, $melbourneTimezone)
+{
+	while(ob_get_level()) ob_end_clean();
+	header('Connection: close');
+	ignore_user_abort();
+	ob_start();
+	echo('Connection Closed');
+	$size = ob_get_length();
+	header("Content-Length: $size");
+	ob_end_flush();
+	flush();
+
 	$serviceData = new ServiceRouteData($tramNumber, getTramClass($tramNumber), true);
 	$currentLat = $serviceData->currentLat;
 	$currentLon = $serviceData->currentLon;
 	$routeNo = (int)$serviceData->routeNo;
 	$offUsualRoute = $serviceData->offUsualRoute;
 	$destination = $serviceData->destination;
-	$direction = $serviceData->direction;	
+	$direction = $serviceData->direction;
 	
-	if ($currentLat != "" && $currentLon != "")
+	if(isset($serviceData->error) && $serviceData->error == 'apierror')
+	{
+		$type = "API ERROR";
+	}
+	else if ($currentLat != "" && $currentLon != "")
 	{
 		if ($offUsualRoute != '1')
 		{
@@ -70,7 +115,7 @@ while($row = $result->fetch_assoc())
 		$mysqli->query($updateDateSql);
 		$type = "DATE";
 	}
-	echo "Updated $tramNumber $type<BR>";
+	echo "<BR>Updated $tramNumber $type<BR>";
 }
 ?>
 DONE
