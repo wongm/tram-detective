@@ -31,6 +31,12 @@ class ServiceRouteData extends Persistent
 
 		// Now the heavy lifting
 		$serviceData = new ServiceData($tramNumber, $tramClass);
+		
+		if(isset($serviceData->error))
+		{
+			$this->error = $serviceData->error;
+			return;
+		}
 
 		// Map the data back
 		$this->tramNumber = $serviceData->tramNumber;

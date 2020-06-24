@@ -45,6 +45,9 @@ if(isset($serviceData->error))
 			$errormessage = 'Tram is at the route ' . $serviceData->routeNo . ' terminus at ' . $serviceData->destination . '.';
 			$errorclass = "terminus";
 			break;
+		default:
+			$errormessage = 'Unable to load data from TramTracker feed.';
+			break;
 	}
 ?>
 <div class="<?php echo $errorclass ?>"><p><?php echo $errormessage ?></p></div>

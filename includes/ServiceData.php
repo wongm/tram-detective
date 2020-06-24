@@ -51,7 +51,7 @@ class ServiceData extends Persistent
 		    $info = $this->soapClient->GetNextPredictedArrivalTimeAtStopsForTramNo($ap_param);
 		} catch (SoapFault $fault) {
 		    $error = 1;
-		    $this->error = "SOAP error. Code: ".$fault->faultcode.". Message: ".$fault->faultstring.".";
+		    $this->error = "apierror";	// don't include $fault->faultcode or $fault->faultstring
 			return;
 		}
 
