@@ -35,7 +35,7 @@ $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPass
 $sqlWhere = "lastupdated < (NOW() - INTERVAL " . UPDATE_MINUTES . " MINUTE)";
 if (isset($_GET['odds']) && is_numeric($_GET['odds']))
 {
-	$sqlWhere .= " AND MOD(id, 2) = " . $_GET['odds'];
+	$sqlWhere .= " AND MOD(id, 2) = " . $_GET['odds'] . " AND LENGTH(id) = " . $_GET['length'];
 }
 
 $sqlLimit = "LIMIT 0, " . BATCH_SIZE;
