@@ -45,13 +45,29 @@ class ServiceData extends Persistent
 		// Setup the GetNextPredictedArrivalTimeAtStopsForTramNo parameters
 		$ap_param = array( 'tramNo' => $tramNumber);
 
+		//get timeout (need to be reverted back afterwards)
+		$timeout = ini_get('default_socket_timeout');
+		
 		// Call GetNextPredictedArrivalTimeAtStopsForTramNo ()
 		$error = 0;
+		
 		try {
+			// set a nice short timeout
+			ini_set('default_socket_timeout', 2);
+			
+			// hit the API
 		    $info = $this->soapClient->GetNextPredictedArrivalTimeAtStopsForTramNo($ap_param);
+			
+			//revert back
+			ini_set('default_socket_timeout', $timeout);
+			
 		} catch (SoapFault $fault) {
 		    $error = 1;
 		    $this->error = "apierror";	// don't include $fault->faultcode or $fault->faultstring
+			
+			//revert back
+			ini_set('default_socket_timeout', $timeout);
+			
 			return;
 		}
 
