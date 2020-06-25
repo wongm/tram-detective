@@ -23,7 +23,7 @@ class ServiceData extends Persistent
 
 	function __construct($tramNumber, $tramClass)
 	{
-		$this->soapClient = new XSoapClient("http://ws.tramtracker.com.au/pidsservice/pids.asmx?wsdl");
+		$this->soapClient = new XSoapClient("http://ws.tramtracker.com.au/pidsservice/pids.asmx?wsdl", array("connection_timeout" => 1));
 
 		// Prepare SoapHeader parameters
 		$sh_param = new stdClass();
@@ -53,7 +53,7 @@ class ServiceData extends Persistent
 		
 		try {
 			// set a nice short timeout
-			ini_set('default_socket_timeout', 2);
+			ini_set('default_socket_timeout', 1);
 			
 			// hit the API
 		    $info = $this->soapClient->GetNextPredictedArrivalTimeAtStopsForTramNo($ap_param);

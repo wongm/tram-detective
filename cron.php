@@ -12,7 +12,7 @@ require_once(__DIR__.'/includes/functions.php');
 require_once(__DIR__.'/includes/ServiceRouteData.php');
 
 define('UPDATE_MINUTES', 10);
-define('BATCH_SIZE', 80);
+define('BATCH_SIZE', 100);
 
 // look for command line parameters and convert them to same ones seen from HTTP GET
 $readMode = !isset($_GET['update']);
@@ -32,13 +32,19 @@ if (!isset($_GET['token']) || $_GET['token'] != $config['cron'])
 
 $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 
+$sqlWhere = "lastupdated < (NOW() - INTERVAL " . UPDATE_MINUTES . " MINUTE)";
+if (isset($_GET['odds']) && is_numeric($_GET['odds']))
+{
+	$sqlWhere .= " AND MOD(id, 2) = " . $_GET['odds'];
+}
+
 $sqlLimit = "LIMIT 0, " . BATCH_SIZE;
 if ($readMode)
 {
 	$sqlLimit = "";
 }
 
-$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE lastupdated < (NOW() - INTERVAL " . UPDATE_MINUTES . " MINUTE) ORDER BY lastupdated ASC $sqlLimit";
+$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams` WHERE $sqlWhere ORDER BY lastupdated ASC $sqlLimit";
 $result = $mysqli->query($tableCheck);
 
 if ($result === false)
