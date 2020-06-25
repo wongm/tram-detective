@@ -1,7 +1,7 @@
 <?php
 
-require_once('includes/config.php');
-require_once('includes/melb-tram-fleet/functions.php');
+require_once(__DIR__.'/config.php');
+require_once(__DIR__.'/melb-tram-fleet/functions.php');
 
 $mysqliConnection = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 $melbourneTimezone = new DateTimeZone('Australia/Melbourne');

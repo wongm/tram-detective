@@ -71,7 +71,6 @@ class ServiceData extends Persistent
 			return;
 		}
 
-
 		if (isset($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult))
 		{
 			$serviceResults = simplexml_load_string($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult->any);
@@ -107,7 +106,7 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		$cacheLocation = "cache/route/route" . $this->routeNo . $this->direction . ".ser";
+		$cacheLocation = __DIR__."/../cache/route/route" . $this->routeNo . $this->direction . ".ser";
 
 		$this->routeData = $this->loadRouteData($cacheLocation, $isUpDirection);
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;

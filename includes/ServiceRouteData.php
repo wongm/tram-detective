@@ -18,7 +18,7 @@ class ServiceRouteData extends Persistent
 	function __construct($tramNumber, $tramClass, $forceRefresh)
 	{
 		// Enable persistence if required
-		parent::__construct("cache/service/tram$tramNumber.ser");
+		parent::__construct(__DIR__."/../cache/service/tram$tramNumber.ser");
 
 		// try to load data
 		$this->open();
