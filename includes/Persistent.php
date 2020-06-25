@@ -20,7 +20,6 @@ class Persistent
             }
             else die("Could not write to file ".$this->filename." at Persistant::save");
         }
-        else die("Could not open file ".$this->filename." for writing, at Persistant::save");
 
     }
     /**********************/
