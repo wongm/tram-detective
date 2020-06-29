@@ -35,6 +35,7 @@ require_once('includes/Header.php');
 
 <h2>About</h2>
 <p><a href="quality.php">Data quality</a></p>
+<p><a href="https://github.com/wongm/tram-detective/">Source code on GitHub</a></p>
 
 <h2>Social media</h2>
 <p>Get alerted when trams are off their usual route!</p>
