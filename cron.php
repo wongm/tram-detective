@@ -41,6 +41,7 @@ if (isset($_GET['odds']) && is_numeric($_GET['odds']))
 $sqlLimit = "LIMIT 0, " . BATCH_SIZE;
 if ($readMode)
 {
+	echo "Status check...";
 	$sqlLimit = "";
 }
 
@@ -60,7 +61,16 @@ while($row = $result->fetch_assoc())
 	$time_pre = microtime(true);
 	
 	$tramNumber = $row['id'];
-	$lastupdated = $row['lastupdated'];
+	
+	if ($readMode)
+	{
+		$lastupdated = new DateTime($row['lastupdated']);
+		$lastupdated->setTimezone($melbourneTimezone);
+		$lastupdated = $lastupdated->format('Y-m-d H:i:s');
+		
+		echo "Tram $tramNumber was last updated $lastupdated...<br>";
+		continue;
+	}
 	
 	// skip trams that don't have a class, we no longer care
 	if (strlen(getTramClass($tramNumber)) === 0)
@@ -68,12 +78,6 @@ while($row = $result->fetch_assoc())
 		echo "Skipped non-existent tram $tramNumber$separator";
 		$updateSkippedSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
 		$mysqli->query($updateSkippedSql);
-		continue;
-	}
-	
-	if ($readMode)
-	{
-		echo "Tram $tramNumber last updated $lastupdated...<br>";
 		continue;
 	}
 
