@@ -11,7 +11,7 @@ require_once(__DIR__.'/includes/config.php');
 require_once(__DIR__.'/includes/functions.php');
 require_once(__DIR__.'/includes/ServiceRouteData.php');
 
-define('UPDATE_MINUTES', 10);
+define('UPDATE_MINUTES', 9);
 define('BATCH_SIZE', 100);
 
 // look for command line parameters and convert them to same ones seen from HTTP GET
