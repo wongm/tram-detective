@@ -3,6 +3,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+if (extension_loaded('newrelic')) {
+	newrelic_set_appname("Tram Detective Worker");
+}
+
 $timeStart = microtime(true);
 
 require_once(__DIR__.'/includes/melb-tram-fleet/functions.php');
