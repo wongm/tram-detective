@@ -37,9 +37,11 @@ if (!isset($_GET['token']) || $_GET['token'] != $config['cron'])
 $mysqli = new mysqli($config['dbServer'], $config['dbUsername'], $config['dbPassword'], $config['dbName']);
 
 $sqlWhere = "lastupdated < (NOW() - INTERVAL " . UPDATE_MINUTES . " MINUTE)";
+$message = "";
 if (isset($_GET['odds']) && is_numeric($_GET['odds']))
 {
-	$sqlWhere .= " AND MOD(id, 2) = " . $_GET['odds'] . " AND LENGTH(id) = " . $_GET['length'];
+	$message = " - odds: " . $_GET['odds'] . ", length: " . $_GET['length'];
+	$sqlWhere .= " AND MOD(id, 2) = " . $_GET['odds'] . " AND LENGTH(id) IN (" . $_GET['length'] . ")";
 }
 
 $sqlLimit = "LIMIT 0, " . BATCH_SIZE;
@@ -58,7 +60,7 @@ if ($result === false)
 	die();
 }
 
-echo "Total records: $result->num_rows$separator";
+echo "Total records: $result->num_rows$message$separator";
 
 while($row = $result->fetch_assoc())
 {
