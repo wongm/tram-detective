@@ -76,9 +76,15 @@ else
     {
 		date_default_timezone_set("Australia/Melbourne");
 		
-    	// Convert to minutes, and round down
-    	$predicted = strtotime($nextStop->PredictedArrivalDateTime);
-    	$minutesuntil = floor(($predicted - $serviceData->currentTimestamp) / 60);
+		// Convert to minutes, and round down
+		$predicted = cleanJsonDate($nextStop->PredictedArrivalDateTime);
+		$minutesuntil = floor(($predicted - cleanJsonDate($serviceData->currentTimestampTicks)) / 60);
+		
+		// is this a bug in API after midnight? if difference too big, go back a day
+		if ($minutesuntil > 1400)
+		{
+			$minutesuntil -= 1440;
+		}
 
     	$minutesuntil = ($minutesuntil < 0) ? 0 : $minutesuntil;
 

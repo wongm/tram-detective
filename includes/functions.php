@@ -420,4 +420,10 @@ function drawViewHistoryLink($tramNumber)
 	echo "<a href=\"history.php?id=" . $tramNumber . "&complete=\">Complete history</a></p>";
 }
 
+function cleanJsonDate($jsonDate)
+{
+	$timeZoneRemoved = str_replace( '+1100' , '', str_replace( '+1000' , '', $jsonDate));
+	return preg_replace( '/[^0-9]/', '', $timeZoneRemoved) / 1000;
+}
+
 ?>

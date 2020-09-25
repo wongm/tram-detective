@@ -3,7 +3,7 @@
 DEFINE('NAMESPACE', 'http://www.yarratrams.com.au/pidsservice/');
 
 require_once('RouteData.php');
-require_once('XSoapClient.php');
+require_once('config.php');
 
 class ServiceData extends Persistent
 {
@@ -23,27 +23,9 @@ class ServiceData extends Persistent
 
 	function __construct($tramNumber, $tramClass)
 	{
-		$this->soapClient = new XSoapClient("http://ws.tramtracker.com.au/pidsservice/pids.asmx?wsdl", array("connection_timeout" => 1));
+		global $config;
 
-		// Prepare SoapHeader parameters
-		$sh_param = new stdClass();
-		$sh_param->ClientGuid = 'f8d92cfe-5b58-437a-af5b-c76d8e151507';
-		$sh_param->ClientType = 'WEBPID';
-		$sh_param->ClientVersion = '1.1.0';
-		$sh_param->ClientWebServiceVersion = '6.4.0.0';
-		$headers = new SoapHeader('http://www.yarratrams.com.au/pidsservice/', 'PidsClientHeader', $sh_param);
-
-		// Prepare Soap Client
-		$this->soapClient->__setSoapHeaders(array($headers));
-
-		// Now the heavy lifting
-		$this->loadServiceData($tramNumber, $tramClass);
-	}
-
-	private function loadServiceData($tramNumber, $tramClass)
-	{
-		// Setup the GetNextPredictedArrivalTimeAtStopsForTramNo parameters
-		$ap_param = array( 'tramNo' => $tramNumber);
+		$tramDataUrl = $config['baseApi'] . "/GetNextPredictedArrivalTimeAtStopsForTramNo/$tramNumber/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
 
 		//get timeout (need to be reverted back afterwards)
 		$timeout = ini_get('default_socket_timeout');
@@ -56,12 +38,18 @@ class ServiceData extends Persistent
 			ini_set('default_socket_timeout', 1);
 			
 			// hit the API
-		    $info = $this->soapClient->GetNextPredictedArrivalTimeAtStopsForTramNo($ap_param);
+		    $getTramDataRequest = curl_init($tramDataUrl);
+			curl_setopt($getTramDataRequest, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($getTramDataRequest, CURLOPT_HEADER, 0);
+			$jsonString = curl_exec($getTramDataRequest);
+			curl_close($getTramDataRequest);
 			
+			$info = json_decode($jsonString);
+
 			//revert back
 			ini_set('default_socket_timeout', $timeout);
 			
-		} catch (SoapFault $fault) {
+		} catch (Exception $e) {
 		    $error = 1;
 		    $this->error = "apierror";	// don't include $fault->faultcode or $fault->faultstring
 			
@@ -71,20 +59,19 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		if (isset($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult))
+		if (isset($info->responseObject))
 		{
-			$serviceResults = simplexml_load_string($info->GetNextPredictedArrivalTimeAtStopsForTramNoResult->any);
-
-			$this->tramNumber = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->tramNumber;
-			$this->routeNo = (string) $serviceResults->NewDataSet->TramNoRunDetailsTable->RouteNo;
-			$this->nextStops = $serviceResults->NewDataSet->NextPredictedStopsDetailsTable;
+			$this->tramNumber = (string) $info->responseObject->VehicleNo;
+			$this->routeNo = (string) $info->responseObject->RouteNo;
+			$this->nextStops = $info->responseObject->NextPredictedStopsDetails;
 			$this->offUsualRoute = $this->checkUsualRoute($tramClass, $this->routeNo);
 
 			$this->currentTimestamp = time();
+			$this->currentTimestampTicks = $info->timeResponded;
 
-			$isUpDirection = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Up) == 'true';
-			$atLayover = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->AtLayover) == 'true';
-			$available = ((string) $serviceResults->NewDataSet->TramNoRunDetailsTable->Available) == 'true';
+			$isUpDirection = ((string) $info->responseObject->Up) == '1';
+			$atLayover = ((string) $info->responseObject->AtLayover) == '1';
+			$available = ((string) $info->responseObject->Available) == '1';
 			$this->direction = $isUpDirection ? 'up' : 'down';
 
 			if (!$available)
@@ -99,8 +86,7 @@ class ServiceData extends Persistent
 				return;
 			}
 		}
-
-		if (!isset($serviceResults->NewDataSet))
+		else 
 		{
 			$this->error = "offnetwork";
 			return;
