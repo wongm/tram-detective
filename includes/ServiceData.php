@@ -45,6 +45,7 @@ class ServiceData extends Persistent
 			curl_close($getTramDataRequest);
 			
 			$info = json_decode($jsonString);
+			debugDump($info);
 
 			//revert back
 			ini_set('default_socket_timeout', $timeout);
@@ -59,7 +60,7 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		if (isset($info->responseObject))
+		if (isset($info->responseObject) && strlen($info->errorMessage) == 0)
 		{
 			$this->tramNumber = (string) $info->responseObject->VehicleNo;
 			$this->routeNo = (string) $info->responseObject->RouteNo;
@@ -118,46 +119,59 @@ class ServiceData extends Persistent
 
 	private function loadRouteData($cacheLocation, $isUpDirection)
 	{
+		global $config;
+		
 		$routeData = new RouteData($cacheLocation);
 		$routeData->open();
 
 		//if no cached data exists, then load it then persist
 		if(isset($routeData->routeNo))
 		{
-			return $routeData;
+			//return $routeData;
 		}
 
 		// load route destination details
-		$destinationParam = array( 'routeNo' => $this->routeNo);
-	    $destinationInfo = $this->soapClient->GetDestinationsForRoute($destinationParam);
-		$destinationXML = ($destinationInfo->GetDestinationsForRouteResult->any);
-		preg_match('/<UpDestination>(.*)<\/UpDestination>/', $destinationXML, $upMatches);
-		preg_match('/<DownDestination>(.*)<\/DownDestination>/', $destinationXML, $downMatches);
-		$routeData->upDirection = $upMatches[1];
-		$routeData->downDirection = $downMatches[1];
-
-		if (strlen($destinationInfo->validationResult) > 0)
+		$destinationsForRouteUrl = $config['baseApi'] . "/GetDestinationsForRoute/" . $this->routeNo . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
+		$destinationsForRouteRequest = curl_init($destinationsForRouteUrl);
+		curl_setopt($destinationsForRouteRequest, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($destinationsForRouteRequest, CURLOPT_HEADER, 0);
+		$destinationsForRouteString = curl_exec($destinationsForRouteRequest);
+		curl_close($destinationsForRouteRequest);
+		
+		$destinationsForRouteInfo = json_decode($destinationsForRouteString);
+		debugDump($destinationsForRouteInfo);
+		
+		if (isset($destinationsForRouteInfo->responseObject) && strlen($destinationsForRouteInfo->errorMessage) == 0)
+		{
+			$routeData->upDirection = $destinationsForRouteInfo->responseObject[0]->UpDestination;
+			$routeData->downDirection = $destinationsForRouteInfo->responseObject[0]->DownDestination;
+		}
+		else
 		{
 			$this->error = "invalidroute";
 			return;
 		}
 
 		// load route stop details
-		$stopParam = array( 'routeNo' => $this->routeNo, 'isUpDirection' => ($isUpDirection ? true : false) );
-	    $stopInfo = $this->soapClient->GetListOfStopsByRouteNoAndDirection($stopParam);
-		$stopsXML = new SimpleXMLElement("<NewDataSet>" . $stopInfo->GetListOfStopsByRouteNoAndDirectionResult->any . "</NewDataSet>");
-		$stopsXML->registerXPathNamespace('diffgr', 'urn:schemas-microsoft-com:xml-diffgram-v1');
-		$stopElements = $stopsXML->xpath('diffgr:diffgram/DocumentElement');
+		$listOfStopsUrl = $config['baseApi'] . "/GetListOfStopsByRouteNoAndDirection/" . $this->routeNo . "/" . ($isUpDirection ? "true" : "false") . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
+		$listOfStopsRequest = curl_init($listOfStopsUrl);
+		curl_setopt($listOfStopsRequest, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($listOfStopsRequest, CURLOPT_HEADER, 0);
+		$listOfStopsString = curl_exec($listOfStopsRequest);
+		curl_close($listOfStopsRequest);
+		
+		$listOfStopsInfo = json_decode($listOfStopsString);
+		debugDump($listOfStopsInfo);
 
 		// mash the data into an easy to load array
 		$stopsResults = array();
-		foreach ($stopElements[0] as $stopElement)
+		foreach ($listOfStopsInfo->responseObject as $stopElement)
 		{
 			// map data to be serialisable
-			$key = (string)$stopElement->TID;
+			$key = (string)$stopElement->StopNo;
 			$stopsResultsElement = new stdClass;
-			$stopsResultsElement->Name = (string)$stopElement->Name;
-			$stopsResultsElement->Description = (string)$stopElement->Description;
+			$stopsResultsElement->Name = trim((string)$stopElement->Name);
+			$stopsResultsElement->Description = trim((string)$stopElement->Description);
 			$stopsResultsElement->Latitude = (string)$stopElement->Latitude;
 			$stopsResultsElement->Longitude = (string)$stopElement->Longitude;
 			$stopsResultsElement->SuburbName = (string)$stopElement->SuburbName;
@@ -171,6 +185,16 @@ class ServiceData extends Persistent
 		// persist to the cache file
 		$routeData->save();
 		return $routeData;
+	}
+}
+
+function debugDump($info)
+{
+	if (isset($_GET['dump']) == 1)
+	{
+		echo "<pre>";
+		print_r($info );
+		echo "</pre>";
 	}
 }
 ?>
