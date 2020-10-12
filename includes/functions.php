@@ -67,7 +67,7 @@ function getLastUpdatedData()
 	$now->setTimezone($melbourneTimezone);
 	
 	$minutesOld = $maxlastupdatedDateTime->diff($now)->i;
-	$alert = (boolean)($minutesOld > 2);
+	$alert = (boolean)($minutesOld > 5);
 
 	$data['maxlastupdated'] = $maxlastupdated;
 	$data['minlastupdated'] = $minlastupdated;
