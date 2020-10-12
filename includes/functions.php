@@ -53,18 +53,27 @@ function getLastUpdatedData()
 	$result = $mysqliConnection->query($tableCheck);
 	$row = $result->fetch_assoc();
 
-	$formattedprediction = new DateTime();
-	$formattedprediction->setTimestamp(strtotime($row['maxlastupdated']));
-	$formattedprediction->setTimezone($melbourneTimezone);
-	$maxlastupdated = $formattedprediction->format('d/m/Y H:i:s');
+	$maxlastupdatedDateTime = new DateTime();
+	$maxlastupdatedDateTime->setTimestamp(strtotime($row['maxlastupdated']));
+	$maxlastupdatedDateTime->setTimezone($melbourneTimezone);
+	$maxlastupdated = $maxlastupdatedDateTime->format('d/m/Y H:i:s');
 
-	$formattedprediction = new DateTime();
-	$formattedprediction->setTimestamp(strtotime($row['minlastupdated']));
-	$formattedprediction->setTimezone($melbourneTimezone);
-	$minlastupdated = $formattedprediction->format('d/m/Y H:i:s');
+	$minlastupdatedDateTime = new DateTime();
+	$minlastupdatedDateTime->setTimestamp(strtotime($row['minlastupdated']));
+	$minlastupdatedDateTime->setTimezone($melbourneTimezone);
+	$minlastupdated = $minlastupdatedDateTime->format('d/m/Y H:i:s');
+
+	$now = new DateTime();
+	$now->setTimezone($melbourneTimezone);
+	
+	$minutesOld = $maxlastupdatedDateTime->diff($now)->i;
+	$alert = (boolean)($minutesOld > 2);
 
 	$data['maxlastupdated'] = $maxlastupdated;
 	$data['minlastupdated'] = $minlastupdated;
+	$data['maxlastupdatedtimestamp'] = $maxlastupdatedDateTime;
+	$data['currenttimestamp'] = $now;
+	$data['alert'] =  $alert;
 	return $data;
 }
 
