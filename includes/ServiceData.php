@@ -64,6 +64,7 @@ class ServiceData extends Persistent
 		{
 			$this->tramNumber = (string) $info->responseObject->VehicleNo;
 			$this->routeNo = (string) $info->responseObject->RouteNo;
+			$this->headBoardRouteNo = (string) $info->responseObject->HeadBoardRouteNo;
 			$this->nextStops = $info->responseObject->NextPredictedStopsDetails;
 			$this->offUsualRoute = $this->checkUsualRoute($tramClass, $this->routeNo);
 
@@ -93,7 +94,7 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		$cacheLocation = __DIR__."/../cache/route/route" . $this->routeNo . $this->direction . ".ser";
+		$cacheLocation = __DIR__."/../cache/route/route" . $this->headBoardRouteNo . $this->direction . ".ser";
 
 		$this->routeData = $this->loadRouteData($cacheLocation, $isUpDirection);
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;
@@ -125,13 +126,13 @@ class ServiceData extends Persistent
 		$routeData->open();
 
 		//if no cached data exists, then load it then persist
-		if(isset($routeData->routeNo))
+		if(isset($routeData->headBoardRouteNo))
 		{
-			//return $routeData;
+			return $routeData;
 		}
 
 		// load route destination details
-		$destinationsForRouteUrl = $config['baseApi'] . "/GetDestinationsForRoute/" . $this->routeNo . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
+		$destinationsForRouteUrl = $config['baseApi'] . "/GetDestinationsForRoute/" . $this->headBoardRouteNo . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
 		$destinationsForRouteRequest = curl_init($destinationsForRouteUrl);
 		curl_setopt($destinationsForRouteRequest, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($destinationsForRouteRequest, CURLOPT_HEADER, 0);
@@ -153,7 +154,7 @@ class ServiceData extends Persistent
 		}
 
 		// load route stop details
-		$listOfStopsUrl = $config['baseApi'] . "/GetListOfStopsByRouteNoAndDirection/" . $this->routeNo . "/" . ($isUpDirection ? "true" : "false") . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
+		$listOfStopsUrl = $config['baseApi'] . "/GetListOfStopsByRouteNoAndDirection/" . $this->headBoardRouteNo . "/" . ($isUpDirection ? "true" : "false") . "/?tkn=" . $config['apiToken'] . "&aid=" . $config['aid'];
 		$listOfStopsRequest = curl_init($listOfStopsUrl);
 		curl_setopt($listOfStopsRequest, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($listOfStopsRequest, CURLOPT_HEADER, 0);
@@ -179,6 +180,7 @@ class ServiceData extends Persistent
 		}
 
 		$routeData->routeNo = $this->routeNo;
+		$routeData->headBoardRouteNo = $this->headBoardRouteNo;
 		$routeData->stops = $stopsResults;
 		$routeData->currentTimestamp = date('c');
 
