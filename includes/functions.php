@@ -103,6 +103,11 @@ function getAllStabledTrams()
 	return getAllTramsInternal('stabled');
 }
 
+function getAllTransferTrams()
+{
+	return getAllTramsInternal('transfer');
+}
+
 function getAllTramsInternal($type)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
@@ -113,7 +118,10 @@ function getAllTramsInternal($type)
 			$sqlWhere = 'lat != 0 AND lng != 0 AND offUsualRoute = 1';
 			break;
 		case 'stabled':
-			$sqlWhere = 'lat = 0. AND lng = 0';
+			$sqlWhere = 'lat = 0 AND lng = 0 AND routeNo IS NULL';
+			break;
+		case 'transfer':
+			$sqlWhere = 'lat = 0 AND lng = 0 AND routeNo IS NOT NULL';
 			break;
 		case 'active':
 			$sqlWhere = 'lat != 0 AND lng != 0';

@@ -9,6 +9,10 @@ switch ($type)
 		$pageTitle = "Trams off their usual route";
 		$trams = getAllOffRouteTrams();
 		break;
+	case 'transfer':
+		$pageTitle = "Trams on transfer";
+		$trams = getAllTransferTrams();
+		break;
 	case 'stabled':
 		$pageTitle = "Trams stabled in depots";
 		$trams = getAllStabledTrams();

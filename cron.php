@@ -96,10 +96,12 @@ while($row = $result->fetch_assoc())
 	$destination = $serviceData->destination;
 	$direction = $serviceData->direction;
 
+	// if API is broken then no updates
 	if(isset($serviceData->error) && $serviceData->error == 'apierror')
 	{
 		$type = "API ERROR";
 	}
+	// if we have a location then everytihng is good
 	else if ($currentLat != "" && $currentLon != "")
 	{
 		if ($offUsualRoute != '1')
@@ -123,7 +125,14 @@ while($row = $result->fetch_assoc())
 	}
 	else
 	{
-		$updateDateSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
+		// no route number means stabled, 
+		// otherwise "Tram is on route X towards Y but has no location data available."
+		if ($routeNo == 0)
+		{
+			$routeNo = "null";
+		}
+		
+		$updateDateSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = " . $routeNo . ", `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;
 		$mysqli->query($updateDateSql);
 		$type = "DATE";
 	}

@@ -25,6 +25,7 @@ require_once('includes/Header.php');
 <p><a href="table.php?type=all">All trams</a></p>
 <p><a href="table.php?type=active">Trams in service</a></p>
 <p><a href="table.php?type=offroute">Trams off their usual route</a></p>
+<p><a href="table.php?type=transfer">Trams on transfer</a></p>
 <p><a href="table.php?type=stabled">Trams stabled in depots</a></p>
 
 <h2>Fleet listings</h2>
