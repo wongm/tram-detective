@@ -25,10 +25,17 @@ class Persistent
     /**********************/
     function open()
     {
-        $vars = unserialize(file_get_contents($this->filename));
-        foreach($vars as $key=>$val)
+        try
         {
-            eval("$"."this->$key = $"."vars['"."$key'];");
+            $vars = unserialize(file_get_contents($this->filename));
+            foreach($vars as $key=>$val)
+            {
+                eval("$"."this->$key = $"."vars['"."$key'];");
+            }
+        }
+        catch (exception $e)
+        {
+            echo "Unable to load file " . $this->filename;
         }
     }
     /**********************/
