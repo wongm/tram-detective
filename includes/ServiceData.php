@@ -94,7 +94,27 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		$cacheLocation = __DIR__."/../cache/route/route" . $this->headBoardRouteNo . $this->direction . ".ser";
+		$routeNumber = $this->headBoardRouteNo;
+		// need to use headBoardRouteNo for route 12 trams diverted via La Trobe Street
+		// but can't use it for route 82 depot runs
+		if ($routeNumber == 83)
+		{
+			$routeNumber = 82;
+		}
+		if ($routeNumber == 56)
+		{
+			$routeNumber = 57;
+		}
+		if ($routeNumber == 36)
+		{
+			$routeNumber = 30;
+		}
+		if ($routeNumber == 0)
+		{
+			$routeNumber = $this->routeNo;
+		}
+
+		$cacheLocation = __DIR__."/../cache/route/route" . $routeNumber . $this->direction . ".ser";
 
 		$this->routeData = $this->loadRouteData($cacheLocation, $isUpDirection);
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;
