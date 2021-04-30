@@ -128,6 +128,17 @@ class ServiceData extends Persistent
 		$nextStop = $this->nextStops[0];
 		$currentStopNo = (string)$nextStop->StopNo;
 		$currentLocation = $this->routeData->stops[$currentStopNo];
+
+		$lastServiceStop = end($this->nextStops);
+		$lastRouteStopNo = array_key_last($this->routeData->stops);
+
+		// display destinations of shortworkings correctly
+		if ($lastServiceStop->StopNo != $lastRouteStopNo)
+		{
+			$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
+			$this->destination = $lastServiceStopData->Description;
+		}
+
 		$this->currentLat = $currentLocation->Latitude;
 		$this->currentLon = $currentLocation->Longitude;
 	}
