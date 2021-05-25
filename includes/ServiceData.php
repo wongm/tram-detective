@@ -117,6 +117,14 @@ class ServiceData extends Persistent
 		$cacheLocation = __DIR__."/../cache/route/route" . $routeNumber . $this->direction . ".ser";
 
 		$this->routeData = $this->loadRouteData($cacheLocation, $isUpDirection);
+		
+		// dump data for debugging
+		// most likely issue is headBoardRouteNo not having matching data
+		if ($this->routeData == null)
+		{
+			print_r($this);
+		}
+		
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;
 
 		if (sizeof($this->nextStops) == 0)
@@ -128,6 +136,14 @@ class ServiceData extends Persistent
 		$nextStop = $this->nextStops[0];
 		$currentStopNo = (string)$nextStop->StopNo;
 		$currentLocation = $this->routeData->stops[$currentStopNo];
+
+		// dump data for debugging
+		// issues with shop not appearing on a route?
+		if ($currentLocation == null)
+		{
+			print_r($this);
+			print_r($currentLocation);
+		}
 
 		$lastServiceStop = end($this->nextStops);
 		$lastRouteStopNo = array_key_last($this->routeData->stops);
