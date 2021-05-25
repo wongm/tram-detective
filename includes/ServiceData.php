@@ -135,14 +135,22 @@ class ServiceData extends Persistent
 		
 		$nextStop = $this->nextStops[0];
 		$currentStopNo = (string)$nextStop->StopNo;
-		$currentLocation = $this->routeData->stops[$currentStopNo];
-
-		// dump data for debugging
-		// issues with shop not appearing on a route?
-		if ($currentLocation == null)
+		$currentLocation = null;
+		if (array_key_exists($currentStopNo, $this->routeData->stops)) 
 		{
+			$currentLocation = $this->routeData->stops[$currentStopNo];
+			$this->currentLat = $currentLocation->Latitude;
+			$this->currentLon = $currentLocation->Longitude;
+		}
+		else
+		{
+			// dump data for debugging
+			// issues with stop not appearing on a route?
+			echo "Stop $currentStopNo not found for tram $tramNumber";
+			echo "<!-- Raw data: currentLocation null";
 			print_r($this);
 			print_r($currentLocation);
+			echo "-->";
 		}
 
 		$lastServiceStop = end($this->nextStops);
@@ -155,8 +163,6 @@ class ServiceData extends Persistent
 			$this->destination = $lastServiceStopData->Description;
 		}
 
-		$this->currentLat = $currentLocation->Latitude;
-		$this->currentLon = $currentLocation->Longitude;
 	}
 
 	private function checkUsualRoute($tramClass, $routeNo)
