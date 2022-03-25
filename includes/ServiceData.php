@@ -159,10 +159,17 @@ class ServiceData extends Persistent
 		// display destinations of shortworkings correctly
 		if ($lastServiceStop->StopNo != $lastRouteStopNo)
 		{
-			$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
-			$this->destination = $lastServiceStopData->Description;
+			// code hack for 8008 not being valid stop on route 86
+			if ($lastServiceStop->StopNo == 8008)
+			{
+				array_pop($this->nextStops);
+			}
+			else
+			{
+				$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
+				$this->destination = $lastServiceStopData->Description;
+			}
 		}
-
 	}
 
 	private function checkUsualRoute($tramClass, $routeNo)
