@@ -256,7 +256,7 @@ function getAllTramHistory($id, $extended, $complete)
 		$limit = "";
 		if ($extended)
 		{
-			$limit = " LIMIT 100";
+			$limit = " LIMIT 1500";
 		}
 		
 		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . " ORDER BY `id` DESC" . $limit;
