@@ -169,9 +169,15 @@ class ServiceData extends Persistent
 			}
 			else
 			{
+				if(isset($this->routeData->stops[$lastServiceStop->StopNo])) {
 					$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
 					$this->destination = $lastServiceStopData->Description;
+				} else {
+					echo "Stop ID " . $lastServiceStop->StopNo . " does not exist on route $routeNumber";
+					$this->destination = "";
+				}
 			}
+			
 		}
 
 	}
