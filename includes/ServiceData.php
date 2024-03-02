@@ -41,6 +41,9 @@ class ServiceData extends Persistent
 		    $getTramDataRequest = curl_init($tramDataUrl);
 			curl_setopt($getTramDataRequest, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($getTramDataRequest, CURLOPT_HEADER, 0);
+			curl_setopt($getTramDataRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+			curl_setopt($getTramDataRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
+
 			$jsonString = curl_exec($getTramDataRequest);
 			curl_close($getTramDataRequest);
 			
@@ -166,10 +169,11 @@ class ServiceData extends Persistent
 			}
 			else
 			{
-				$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
-				$this->destination = $lastServiceStopData->Description;
+					$lastServiceStopData = $this->routeData->stops[$lastServiceStop->StopNo];
+					$this->destination = $lastServiceStopData->Description;
 			}
 		}
+
 	}
 
 	private function checkUsualRoute($tramClass, $routeNo)
@@ -196,6 +200,8 @@ class ServiceData extends Persistent
 		$destinationsForRouteRequest = curl_init($destinationsForRouteUrl);
 		curl_setopt($destinationsForRouteRequest, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($destinationsForRouteRequest, CURLOPT_HEADER, 0);
+		curl_setopt($destinationsForRouteRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+		curl_setopt($destinationsForRouteRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
 		$destinationsForRouteString = curl_exec($destinationsForRouteRequest);
 		curl_close($destinationsForRouteRequest);
 		
@@ -218,6 +224,8 @@ class ServiceData extends Persistent
 		$listOfStopsRequest = curl_init($listOfStopsUrl);
 		curl_setopt($listOfStopsRequest, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($listOfStopsRequest, CURLOPT_HEADER, 0);
+		curl_setopt($listOfStopsRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+		curl_setopt($listOfStopsRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
 		$listOfStopsString = curl_exec($listOfStopsRequest);
 		curl_close($listOfStopsRequest);
 		
