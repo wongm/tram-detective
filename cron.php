@@ -79,7 +79,7 @@ while($row = $result->fetch_assoc())
 	}
 	
 	// skip trams that don't have a class, we no longer care
-	if (strlen(getTramClass($tramNumber)) === 0)
+	if (getTramClass($tramNumber) === null)
 	{
 		echo "Skipped non-existent tram $tramNumber$separator";
 		$updateSkippedSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = 0, `lng` = 0, `routeNo` = null, `destination` = '', `lastupdated` = NOW() WHERE id = " . $tramNumber;

@@ -9,11 +9,13 @@ class ServiceData extends Persistent
 {
 	var $tramNumber;
 	var $routeNo;
+	var $headBoardRouteNo;
 	var $offUsualRoute;
 	var $destination;
 	var $direction;
 	var $nextStops;
 	var $currentTimestamp;
+	var $currentTimestampTicks;
 	var $currentLat;
 	var $currentLon;
 	var $routeData;
@@ -63,7 +65,7 @@ class ServiceData extends Persistent
 			return;
 		}
 
-		if (isset($info->responseObject) && strlen($info->errorMessage) == 0)
+		if (isset($info->responseObject) && $info->errorMessage === null)
 		{
 			$this->tramNumber = (string) $info->responseObject->VehicleNo;
 			$this->routeNo = (string) $info->responseObject->RouteNo;
@@ -125,7 +127,7 @@ class ServiceData extends Persistent
 		// most likely issue is headBoardRouteNo not having matching data
 		if ($this->routeData == null)
 		{
-			print_r($this);
+			debugDump($this);
 		}
 		
 		$this->destination = $isUpDirection ? $this->routeData->upDirection : $this->routeData->downDirection;
@@ -214,7 +216,7 @@ class ServiceData extends Persistent
 		$destinationsForRouteInfo = json_decode($destinationsForRouteString);
 		debugDump($destinationsForRouteInfo);
 		
-		if (isset($destinationsForRouteInfo->responseObject) && strlen($destinationsForRouteInfo->errorMessage) == 0)
+		if (isset($destinationsForRouteInfo->responseObject) && $destinationsForRouteInfo->errorMessage === null)
 		{
 			$routeData->upDirection = $destinationsForRouteInfo->responseObject[0]->UpDestination;
 			$routeData->downDirection = $destinationsForRouteInfo->responseObject[0]->DownDestination;
