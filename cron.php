@@ -117,7 +117,7 @@ while($row = $result->fetch_assoc())
 		
 		$updateTramLocationSql = "UPDATE `" . $config['dbName'] . "`.`trams` SET `lat` = " . $currentLat . ", `lng` = " . $currentLon . ", `lastupdated` = NOW(), `lastservice` = NOW(), `routeNo` = " . $routeNo . ", `offUsualRoute` = " . $offUsualRoute . ", `destination` = \"" . $destination . "\", `direction` = '" . $direction . "' WHERE id = " . $tramNumber;
 		$mysqli->query($updateTramLocationSql);
-		$insertTramHistorySql = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $unixTimestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", '" . $destination . "', '" . $direction . "')";
+		$insertTramHistorySql = "INSERT INTO `" . $config['dbName'] . "`.`trams_history` (`tramid`, `lat`, `lng`, `sighting` , `sighting_day` , `routeNo`, `offUsualRoute`, `destination`, `direction`) VALUES (" . $tramNumber . ", " . $currentLat . ", " . $currentLon . ", NOW(), " . $unixTimestamp . ", '" . $routeNo . "', " . $offUsualRoute . ", \"" . $destination . "\", '" . $direction . "')";
 		$mysqli->query($insertTramHistorySql);
 		$insertTramHistoryDaySql = "INSERT IGNORE INTO `" . $config['dbName'] . "`.`trams_history_for_day` (`tramid`, `routeNo`, `sighting_day`) VALUES (" . $tramNumber . ", " . $routeNo . ", " . $dateISO . ")";
 		$mysqli->query($insertTramHistoryDaySql);
