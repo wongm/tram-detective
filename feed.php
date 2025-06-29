@@ -3,7 +3,7 @@ header("Content-Type: application/rss+xml; charset=ISO-8859-1");
 
 $server = 'https://' . $_SERVER['SERVER_NAME'];
 
-$rssfeed .= "<rss version=\"2.0\">\r\n";
+$rssfeed = "<rss version=\"2.0\">\r\n";
 $rssfeed .= "<channel>\r\n";
 $rssfeed .= "<title>Trams off their usual route</title>\r\n";
 $rssfeed .= "<link>$server</link>\r\n";
