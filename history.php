@@ -8,16 +8,16 @@ require_once('includes/functions.php');
 $historyType = "History summary";
 $tramNumber = (int) $_GET['id'];
 
-$extended = $complete = false;
+$extended = false;
+$quantity = 1;
 if (array_key_exists('extended', $_GET))
 {
-	$historyType = "Recent history";
+	$quantity = (int) $_GET['extended'];
+	if ($quantity == 0) {
+		$quantity = 1;
+	}
+	$historyType = "Recent history x " . $quantity;
 	$extended = true;
-}
-if (array_key_exists('complete', $_GET))
-{
-	$historyType = "Complete history";
-	$complete = true;
 }
 if (!is_numeric($tramNumber))
 {
@@ -35,7 +35,7 @@ $pageTitle = "Tram " . getTramClassAndNumber($tramNumber) . " - " . $historyType
 $pageDescription = "Tracking tram " . getTramClassAndNumber($tramNumber) . " around Melbourne";
 require_once('includes/Header.php');
 
-$history = getAllTramHistory($tramNumber, $extended, $complete);
+$history = getAllTramHistory($tramNumber, $extended, $quantity);
 
 drawViewHistoryLink($tramNumber);
 

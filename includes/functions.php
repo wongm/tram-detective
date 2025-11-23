@@ -247,16 +247,17 @@ function getAllRouteHistory($route)
 	return $history;
 }
 
-function getAllTramHistory($id, $extended, $complete)
+function getAllTramHistory($id, $extended, $quantity)
 {
 	global $config, $mysqliConnection, $melbourneTimezone;
 	
-	if ($extended || $complete)
+	if ($extended)
 	{
 		$limit = "";
 		if ($extended)
 		{
-			$limit = " LIMIT 1500";
+			$limitCount = 1500 * intval($quantity);
+			$limit = " LIMIT " . $limitCount;
 		}
 		
 		$tableCheck = "SELECT * FROM `" . $config['dbName'] . "`.`trams_history` WHERE `tramid` = " . $id . " ORDER BY `id` DESC" . $limit;
@@ -275,7 +276,7 @@ function getAllTramHistory($id, $extended, $complete)
 	$history = array();
 	while($row = $result->fetch_assoc())
 	{
-		if ($extended || $complete)
+		if ($extended)
 		{
 			$day = $row['sighting'];
 			$sighting = new DateTime();
