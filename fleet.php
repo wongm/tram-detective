@@ -15,7 +15,7 @@ foreach ($melbourne_trams as $class => $classData)
     foreach ($classData['trams'] as $tram_number)
     {
         $tram = $class . '.' . $tram_number;
-        echo '<li><a href="http://railgallery.wongm.com/page/search/' . $tram . '">' . $tram . '</a>';
+        echo '<li><a href="http://railgallery.wongm.com/page/search/?s=' . $tram . '">' . $tram . '</a>';
     }
     
     echo "</ul></li>";
